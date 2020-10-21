@@ -27,6 +27,23 @@ public class Registro {
 
     }
 
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
+    public Boolean getEntrada() {
+        return entrada;
+    }
 
+    public PuntoRuta getPuntoR() {
+        return puntoR;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public void setEntrada(Boolean entrada) {
+        this.entrada = entrada;
+    }
 }

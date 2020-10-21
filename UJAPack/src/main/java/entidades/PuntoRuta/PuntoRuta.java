@@ -1,16 +1,33 @@
 package entidades.PuntoRuta;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class PuntoRuta {
 
-    /* Id de un Punto de Ruta */
+    /* Int ID */
     @NotBlank
     int id;
 
+    /* Nombre */
+    @NotBlank
+    String nombre;
+
     /* Conexiones Puntos de Ruta*/
-    @NotEmpty
+   // @NotEmpty
     Map<Integer, PuntoRuta> conexiones;
+
+    public PuntoRuta(int _id,String _nombre){
+        this.id = _id;
+        this.nombre =_nombre;
+        this.conexiones = new HashMap<>();
+    }
+
+    public void setConexiones(Map<Integer, PuntoRuta> conexiones) {
+        this.conexiones = conexiones;
+    }
+    public void setConexion(CentroLog centro) {
+        //Hacer
+    }
 }

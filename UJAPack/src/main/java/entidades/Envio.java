@@ -2,6 +2,7 @@ package entidades;
 import javax.swing.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 
 public class Envio {
@@ -16,7 +17,7 @@ public class Envio {
 
     /* Lista de Registros de los Puntos */
     @NotEmpty
-    JList<Registro> ruta;
+    List<Registro> ruta;
 
     /* Peso */
     @NotBlank
@@ -33,7 +34,7 @@ public class Envio {
     /* Estado */
    // Enum estado;
 
-    public Envio(int _id, float _importe, JList<Registro> _ruta, float _peso, String _remitente, String _destinatario){
+    public Envio(int _id, float _importe, List<Registro> _ruta, float _peso, String _remitente, String _destinatario){
         this.id = _id;
         this.importe = _importe;
         this.ruta =_ruta;
@@ -51,7 +52,7 @@ public class Envio {
         return importe;
     }
 
-    public JList<Registro> getRuta() {
+    public List<Registro> getRuta() {
         return ruta;
     }
 
