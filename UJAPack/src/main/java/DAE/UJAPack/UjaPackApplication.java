@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UjaPackApplication {
 
 	public static void main(String[] args) {
+
+
 		SpringApplication.run(UjaPackApplication.class, args);
+
 	}
 
 }
