@@ -36,17 +36,17 @@ public abstract class PuntoRuta {
         return conexiones;
     }
 
+    public String getLugar() {
+        return nombre;
+    }
+
     public void setConexiones(Map<Integer, PuntoRuta> conexiones) {
         this.conexiones = conexiones;
     }
 
-    public void setConexion(CentroLog centro) {
-        this.conexiones.put(centro.getId(),centro);
-    }
+
     public void setConexion(PuntoRuta centro) {
         this.conexiones.put(centro.getId(),centro);
     }
-    public void setConexion(Oficina oficina) {
-        this.conexiones.put(oficina.getId(),oficina);
-    }
+
 }

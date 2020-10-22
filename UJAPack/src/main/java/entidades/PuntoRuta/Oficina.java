@@ -18,12 +18,14 @@ public class Oficina extends PuntoRuta {
         this.centroLog = _centroLog;
     }
 
-    public String getOficina() {
+    public String getLugar() {
         return oficina;
     }
 
     public String getCentroLog() {
         return centroLog;
     }
-
+    public void setConexion(Oficina oficina) {
+        this.conexiones.put(oficina.getId(),oficina);
+    }
 }

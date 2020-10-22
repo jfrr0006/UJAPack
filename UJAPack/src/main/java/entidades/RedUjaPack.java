@@ -21,19 +21,19 @@ public class RedUjaPack {
     /*Datos del fichero json*/
     static Map<Integer, PuntoRuta> puntos;
 
-    public RedUjaPack (){
+    public RedUjaPack () throws IOException {
         puntos = new HashMap<>();
-
+        leerJson("UJAPack\\src\\main\\resources\\redujapack.json");
 
     }
     public static Map<Integer, PuntoRuta> getPuntos() {
         return puntos;
     }
 
-    public static void leerJson(String file) throws IOException {
+    private static void leerJson(String file) throws IOException {
 
         Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
-        int cont = 20;
+        int cont = 11;
 
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
@@ -88,9 +88,7 @@ public class RedUjaPack {
             for (Integer con : conexiones.get(centro)){
                 puntos.get(centro).setConexion(puntos.get(con));
 
-
             }
-
 
         }
 
@@ -148,7 +146,17 @@ public class RedUjaPack {
 
     }
 
-    private void mostrarRuta(List<PuntoRuta> ruta){
+    private int convertirStringEnPuntoRuta(String lugar){
+
+        for (PuntoRuta value : puntos.values()) {
+            if(value.getLugar().equals(lugar)){
+                return value.getId();
+            }
+        }
+        return -1;
+    }
+
+    private void mostrarRuta(List<PuntoRuta> ruta){//Se borrara
 
         for(PuntoRuta punto : ruta){
             System.out.print(punto.getNombre()+"( "+punto.getId()+" ) --> " );
@@ -157,8 +165,25 @@ public class RedUjaPack {
 
     }
 
-    public void pruebaVerRuta(){
-        mostrarRuta(calcularRuta(puntos.get(22),puntos.get(50)));
+    public void pruebaVerRuta(String remitente, String destinatario){//Se Borrara o modificará
+        int orig=convertirStringEnPuntoRuta(remitente);
+        int dest=convertirStringEnPuntoRuta(destinatario);
+        if( orig == -1 || dest == -1 ){
+            //Lo correcto seria en convertirString lanzar una excepcion pero bueno por ahora vamos a dejarlo asi y luego vemos
+            System.out.println("Datos de Ubicacion incorrectos");
+
+        }else{
+        mostrarRuta(calcularRuta(puntos.get(orig),puntos.get(dest)));
+
+        }
+
+    }
+
+    public List<PuntoRuta> listaRutaMinima(String remitente, String destinatario){//Se Borrara o modificará
+        int orig=convertirStringEnPuntoRuta(remitente);
+        int dest=convertirStringEnPuntoRuta(destinatario);
+        //excepcion si se va a usar
+        return calcularRuta(puntos.get(orig),puntos.get(dest));
 
     }
 }

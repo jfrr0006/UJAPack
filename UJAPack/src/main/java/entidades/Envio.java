@@ -1,5 +1,4 @@
 package entidades;
-import javax.swing.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -9,7 +8,7 @@ public class Envio {
 
     /* Id de envio */
     @NotBlank
-    int id;
+    long id;
 
     /* Importe */
     @NotBlank
@@ -23,6 +22,10 @@ public class Envio {
     @NotBlank
     float peso;
 
+    /* Peso */
+    @NotBlank
+    float dimensiones;
+
     /* Remitente */
     @NotBlank
     String remitente;
@@ -34,17 +37,18 @@ public class Envio {
     /* Estado */
    // Enum estado;
 
-    public Envio(int _id, float _importe, List<Registro> _ruta, float _peso, String _remitente, String _destinatario){
+    public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario){
         this.id = _id;
         this.importe = _importe;
         this.ruta =_ruta;
         this.peso =_peso;
+        this.dimensiones =_dimensiones;
         this.remitente = _remitente;
         this.destinatario = _destinatario;
 
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

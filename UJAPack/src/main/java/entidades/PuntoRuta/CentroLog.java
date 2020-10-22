@@ -18,10 +18,11 @@ public class CentroLog extends PuntoRuta {
 
     }
 
-
-    public String getLocalizacion() {
+    public String getLugar() {
         return localizacion;
     }
-
+    public void setConexion(CentroLog centro) {
+        this.conexiones.put(centro.getId(),centro);
+    }
 
 }
