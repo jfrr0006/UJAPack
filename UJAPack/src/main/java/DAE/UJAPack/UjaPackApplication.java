@@ -1,15 +1,20 @@
 package DAE.UJAPack;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import entidades.RedUjaPack;
 
-@SpringBootApplication
+import java.io.IOException;
+
+//@SpringBootApplication(scanBasePackages="servicios")
 public class UjaPackApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 
-		SpringApplication.run(UjaPackApplication.class, args);
+		RedUjaPack prueba= new RedUjaPack();
+		prueba.leerJson("UJAPack\\src\\main\\resources\\redujapack.json");
+	//	SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
+	//	ApplicationContext context = servidor.run(args);
+
 
 	}
 

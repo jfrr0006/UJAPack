@@ -24,10 +24,29 @@ public abstract class PuntoRuta {
         this.conexiones = new HashMap<>();
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public Map<Integer, PuntoRuta> getConexiones() {
+        return conexiones;
+    }
+
     public void setConexiones(Map<Integer, PuntoRuta> conexiones) {
         this.conexiones = conexiones;
     }
+
     public void setConexion(CentroLog centro) {
-        //Hacer
+        this.conexiones.put(centro.getId(),centro);
+    }
+    public void setConexion(PuntoRuta centro) {
+        this.conexiones.put(centro.getId(),centro);
+    }
+    public void setConexion(Oficina oficina) {
+        this.conexiones.put(oficina.getId(),oficina);
     }
 }
