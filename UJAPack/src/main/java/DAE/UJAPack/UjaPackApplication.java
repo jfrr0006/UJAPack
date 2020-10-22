@@ -12,6 +12,7 @@ public class UjaPackApplication {
 
 		RedUjaPack prueba= new RedUjaPack();
 		prueba.leerJson("UJAPack\\src\\main\\resources\\redujapack.json");
+		prueba.pruebaVerRuta();
 	//	SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
 	//	ApplicationContext context = servidor.run(args);
 
