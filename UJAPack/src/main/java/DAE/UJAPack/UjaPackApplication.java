@@ -13,8 +13,8 @@ public class UjaPackApplication {
 
 		RedUjaPack prueba= new RedUjaPack();
 		prueba.pruebaVerRuta("Ceuta","Barcelona");
-	//	SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
-	//	ApplicationContext context = servidor.run(args);
+		//	SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
+		//	ApplicationContext context = servidor.run(args);
 
 
 	}

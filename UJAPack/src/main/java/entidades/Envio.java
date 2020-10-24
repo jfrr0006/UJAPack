@@ -1,4 +1,6 @@
 package entidades;
+
+import Utils.Estado;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -18,6 +20,10 @@ public class Envio {
     @NotEmpty
     List<Registro> ruta;
 
+    /* Registro Actual */
+    @NotEmpty
+    int registroActual;
+
     /* Peso */
     @NotBlank
     float peso;
@@ -35,7 +41,7 @@ public class Envio {
     String destinatario;
 
     /* Estado */
-   // Enum estado;
+    Estado estado;
 
     public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario){
         this.id = _id;
@@ -45,6 +51,8 @@ public class Envio {
         this.dimensiones =_dimensiones;
         this.remitente = _remitente;
         this.destinatario = _destinatario;
+        this.estado = Estado.EnTransito;
+        this.registroActual=0;
 
     }
 
@@ -72,6 +80,19 @@ public class Envio {
         return destinatario;
     }
 
+    public float getDimensiones() { return dimensiones; }
 
+    public Estado getEstado() { return estado; }
 
+    public int getRegistroActual() {
+        return registroActual;
+    }
+
+    public void avanzarRegistroActual() {
+        this.registroActual++;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
 }
