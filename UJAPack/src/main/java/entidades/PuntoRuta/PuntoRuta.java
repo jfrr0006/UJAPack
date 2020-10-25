@@ -15,7 +15,6 @@ public abstract class PuntoRuta {
     String nombre;
 
     /* Conexiones Puntos de Ruta*/
-   // @NotEmpty
     Map<Integer, PuntoRuta> conexiones;
 
     public PuntoRuta(int _id,String _nombre){
@@ -28,9 +27,6 @@ public abstract class PuntoRuta {
         return id;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
 
     public Map<Integer, PuntoRuta> getConexiones() {
         return conexiones;
@@ -39,11 +35,6 @@ public abstract class PuntoRuta {
     public String getLugar() {
         return nombre;
     }
-
-    public void setConexiones(Map<Integer, PuntoRuta> conexiones) {
-        this.conexiones = conexiones;
-    }
-
 
     public void setConexion(PuntoRuta centro) {
         this.conexiones.put(centro.getId(),centro);

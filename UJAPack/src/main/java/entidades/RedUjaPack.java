@@ -38,7 +38,7 @@ public class RedUjaPack {
         BufferedReader br = new BufferedReader(fr);
 
         StringBuilder strB = new StringBuilder();
-        String strA = null;
+        String strA;
 
         while((strA = br.readLine()) != null){
             strB.append(strA);
