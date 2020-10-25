@@ -1,4 +1,4 @@
-package Utils;
+package utils;
 
 public enum Estado {
     EnTransito,

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import entidades.PuntoRuta.CentroLog;
 import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
+import excepciones.DireccionesIncorrectas;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,11 +24,8 @@ public class RedUjaPack {
 
     public RedUjaPack () throws IOException {
         puntos = new HashMap<>();
-        leerJson("UJAPack\\src\\main\\resources\\redujapack.json");
+        leerJson("E:\\Universidad\\4º\\Empresariales\\UJAPack\\UJAPack\\src\\main\\resources\\redujapack.json");
 
-    }
-    public static Map<Integer, PuntoRuta> getPuntos() {
-        return puntos;
     }
 
     private static void leerJson(String file) throws IOException {
@@ -153,36 +151,22 @@ public class RedUjaPack {
                 return value.getId();
             }
         }
-        return -1;
+        throw new DireccionesIncorrectas();
     }
 
     private void mostrarRuta(List<PuntoRuta> ruta){//Se borrara
 
         for(PuntoRuta punto : ruta){
-            System.out.print(punto.getNombre()+"( "+punto.getId()+" ) --> " );
+            System.out.print(punto.getLugar()+"( "+punto.getId()+" ) --> " );
 
         }
 
     }
 
-    public void pruebaVerRuta(String remitente, String destinatario){//Se Borrara o modificará
-        int orig=convertirStringEnPuntoRuta(remitente);
-        int dest=convertirStringEnPuntoRuta(destinatario);
-        if( orig == -1 || dest == -1 ){
-            //Lo correcto seria en convertirString lanzar una excepcion pero bueno por ahora vamos a dejarlo asi y luego vemos
-            System.out.println("Datos de Ubicacion incorrectos");
-
-        }else{
-        mostrarRuta(calcularRuta(puntos.get(orig),puntos.get(dest)));
-
-        }
-
-    }
 
     public List<PuntoRuta> listaRutaMinima(String remitente, String destinatario){//Se Borrara o modificará
         int orig=convertirStringEnPuntoRuta(remitente);
         int dest=convertirStringEnPuntoRuta(destinatario);
-        //excepcion si se va a usar
         return calcularRuta(puntos.get(orig),puntos.get(dest));
 
     }

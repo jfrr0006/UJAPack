@@ -1,18 +1,26 @@
 package DAE.UJAPack;
 
-import entidades.RedUjaPack;
-
-import java.io.IOException;
+import servicios.UjaPack;
 
 //@SpringBootApplication(scanBasePackages="servicios")
 public class UjaPackApplication {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
+		String remi1="Ceuta";
+		String desti1="Barcelona";
+		Float peso1 = 5.0f;
+		Float dimen1 = 10.0f;
+		UjaPack servicio = new UjaPack();
 
-		//Claramente esto no es asi lo uso de main para hacer pruebas hasta tener los tests
+		servicio.generarEnvio(remi1,desti1,peso1,dimen1);
+		for (int i=0;i<25;i++){
 
-		RedUjaPack prueba= new RedUjaPack();
-		prueba.pruebaVerRuta("Ceuta","Barcelona");
+			servicio.avanzarEnvios();
+
+
+		}
+		servicio.avanzarEnvios();
+		servicio.mostrarPrueba();
 		//	SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
 		//	ApplicationContext context = servidor.run(args);
 

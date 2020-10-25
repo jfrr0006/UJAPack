@@ -1,12 +1,16 @@
 package servicios;
 
-import Utils.Estado;
 import entidades.Envio;
 import entidades.PuntoRuta.PuntoRuta;
 import entidades.RedUjaPack;
 import entidades.Registro;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import utils.Estado;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,10 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Validated
 public class UjaPack {
 
-    /*Toda la red*/
+    /* Toda la red de puntos de control */
     RedUjaPack red;
+    /*Mapa con la lista de Envios ordenada por ID*/
     Map<Long,Envio> envios;
 
     public UjaPack() throws IOException {
@@ -27,7 +33,11 @@ public class UjaPack {
 
     }
 
-    public void generarEnvio(String remitente,String destinatario,Float peso, Float dimensiones){
+    public void generarEnvio(@NotBlank @Valid String remitente, @NotBlank @Valid String destinatario, @Positive @Valid Float peso, @Positive @Valid Float dimensiones){
+   //     if(peso<0 || dimensiones<0){
+   //         throw new DimensionesPesoIncorrectos();
+   //     }
+
         List<PuntoRuta> ruta = red.listaRutaMinima(remitente,destinatario);
         List<Registro> registros = new ArrayList<>();
 
@@ -65,10 +75,11 @@ public class UjaPack {
         if (envio.getRegistroActual() == 0) {
             entrada = true;
         } else {
-            entrada = !envio.getRuta().get(envio.getRegistroActual()).getEntrada();
+            entrada = !envio.getRuta().get(envio.getRegistroActual()-1).getEntrada();
         }
-        envio.avanzarRegistroActual();
         envio.getRuta().get(envio.getRegistroActual()).actualizarRegistro(LocalDateTime.now(), entrada);
+        envio.avanzarRegistroActual();
+
 
     }
 
@@ -83,6 +94,13 @@ public class UjaPack {
 
         }
 
+
+    }
+    public void mostrarPrueba(){
+        for (Envio envio : envios.values()) {
+            System.out.println(envio.getImporte()+"  "+envio.getRuta().size());
+
+        }
 
     }
 

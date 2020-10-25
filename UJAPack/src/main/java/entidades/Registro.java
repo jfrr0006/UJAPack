@@ -21,9 +21,6 @@ public class Registro {
 
     public Registro(PuntoRuta _puntoR){
         this.puntoR = _puntoR;
-      //  this.entrada = _entrada;
-      //  this.fecha = _fecha;
-
     }
 
     public LocalDateTime getFecha() {

@@ -1,6 +1,6 @@
 package entidades;
 
-import Utils.Estado;
+import utils.Estado;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
