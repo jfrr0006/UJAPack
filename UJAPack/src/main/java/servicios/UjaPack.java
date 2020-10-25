@@ -4,6 +4,7 @@ import entidades.Envio;
 import entidades.PuntoRuta.PuntoRuta;
 import entidades.RedUjaPack;
 import entidades.Registro;
+import excepciones.DirNotificacionIncorrecta;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import utils.Estado;
@@ -32,7 +33,7 @@ public class UjaPack {
 
     }
 
-    public void generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones){
+    public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones){
    //     if(peso<0 || dimensiones<0){
    //         throw new DimensionesPesoIncorrectos();
    //     }
@@ -52,7 +53,7 @@ public class UjaPack {
 
         envios.put(number,nuevoEnvio);
 
-
+        return nuevoEnvio;
     }
 
     private Float calcularCosto(int numPuntosRuta, Float peso, Float dimensiones){
@@ -66,6 +67,7 @@ public class UjaPack {
                 registroES(envio);
                 actualizarEstadoEnvio(envio);
             }
+
         }
     }
 
@@ -77,10 +79,17 @@ public class UjaPack {
             entrada = !envio.getRuta().get(envio.getRegistroActual()-1).getEntrada();
         }
         envio.getRuta().get(envio.getRegistroActual()).actualizarRegistro(LocalDateTime.now(), entrada);
+
+        if(envio.getNotificacion().equals(envio.getRuta().get(envio.getRegistroActual()).getPuntoR().getLugar() ) ){//Ha llegado al punto de notificacion
+            mandarNotificacion(envio);
+
+        }
+
         envio.avanzarRegistroActual();
 
 
     }
+
 
     private void actualizarEstadoEnvio(Envio envio){
         //Actualizar Estado
@@ -92,15 +101,67 @@ public class UjaPack {
             envio.setEstado(Estado.Entregado);
 
         }
-
-
     }
-    public void mostrarPrueba(){
-        for (Envio envio : envios.values()) {
-            System.out.println(envio.getImporte()+"  "+envio.getRuta().size());
 
+    private void mandarNotificacion(Envio envio){
+        //Por ahora simplemente sacaremos por pantalla
+        String es;
+        if(envio.getRuta().get(envio.getRegistroActual()).getEntrada()){
+            es="ha entrado a ";
+        }else{
+            es="ha salido de ";
+        }
+
+        System.out.println("El envio con identificador "+envio.getId()+" "+es+envio.getNotificacion());
+    }
+
+    public void activarNotificacion(long idenvio,String noti){
+        Boolean existe=false;
+        for (Registro regis:  envios.get(idenvio).getRuta()) {
+            if (noti.equals(regis.getPuntoR().getLugar())) {
+                existe = true;
+                break;
+            }
+        }
+        if(existe){
+            envios.get(idenvio).setNotificacion(noti);
+        }else{
+            throw new DirNotificacionIncorrecta();
         }
 
     }
+
+    public String situacionActualEnvio(long idenvio){
+        String es;
+        List<Registro>ruta =envios.get(idenvio).getRuta();
+        int registroActual=envios.get(idenvio).getRegistroActual()-1;
+        if(ruta.get(registroActual).getEntrada()){
+            es="Ha entrado a ";
+        }else{
+            es="Ha salido de ";
+        }
+        return "Ubicacion: "+es+ruta.get(registroActual).getPuntoR().getLugar()+" Hora: "+ruta.get(registroActual).getFecha().toString();
+
+    }
+    public  List<String> listadoRutaEnvio(long idenvio){
+        String es;
+        List<String> registros = new ArrayList<>();
+        int cont=0;
+        List<Registro>ruta =envios.get(idenvio).getRuta();
+
+        while(ruta.get(cont).getFecha()!=null){
+
+            if(ruta.get(cont).getEntrada()){
+                es="Ha entrado a ";
+            }else{
+                es="Ha salido de ";
+            }
+            registros.add("Ubicacion: "+es+ruta.get(cont).getPuntoR().getLugar()+" Hora: "+ruta.get(cont).getFecha().toString());
+            cont++;
+        }
+
+        return registros;
+    }
+
 
 }

@@ -9,6 +9,7 @@ import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
 import excepciones.DireccionesIncorrectas;
 
+import javax.validation.constraints.NotBlank;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -154,17 +155,7 @@ public class RedUjaPack {
         throw new DireccionesIncorrectas();
     }
 
-    private void mostrarRuta(List<PuntoRuta> ruta){//Se borrara
-
-        for(PuntoRuta punto : ruta){
-            System.out.print(punto.getLugar()+"( "+punto.getId()+" ) --> " );
-
-        }
-
-    }
-
-
-    public List<PuntoRuta> listaRutaMinima(String remitente, String destinatario){//Se Borrara o modificará
+    public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario){//Se Borrara o modificará
         int orig=convertirStringEnPuntoRuta(remitente);
         int dest=convertirStringEnPuntoRuta(destinatario);
         return calcularRuta(puntos.get(orig),puntos.get(dest));
