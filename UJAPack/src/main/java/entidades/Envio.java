@@ -3,6 +3,7 @@ package entidades;
 import utils.Estado;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 
@@ -25,11 +26,11 @@ public class Envio {
     int registroActual;
 
     /* Peso */
-    @NotBlank
+    @Positive
     float peso;
 
     /* Peso */
-    @NotBlank
+    @Positive
     float dimensiones;
 
     /* Remitente */

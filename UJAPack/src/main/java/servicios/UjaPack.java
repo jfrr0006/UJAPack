@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import utils.Estado;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class UjaPack {
 
     }
 
-    public void generarEnvio(@NotBlank @Valid String remitente, @NotBlank @Valid String destinatario, @Positive @Valid Float peso, @Positive @Valid Float dimensiones){
+    public void generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones){
    //     if(peso<0 || dimensiones<0){
    //         throw new DimensionesPesoIncorrectos();
    //     }

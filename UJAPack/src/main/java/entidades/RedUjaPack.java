@@ -24,7 +24,7 @@ public class RedUjaPack {
 
     public RedUjaPack () throws IOException {
         puntos = new HashMap<>();
-        leerJson("E:\\Universidad\\4º\\Empresariales\\UJAPack\\UJAPack\\src\\main\\resources\\redujapack.json");
+        leerJson("src\\main\\resources\\redujapack.json");
 
     }
 
