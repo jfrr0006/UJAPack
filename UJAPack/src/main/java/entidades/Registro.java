@@ -12,14 +12,14 @@ public class Registro {
     LocalDateTime fecha;
 
     /* Si el Registro es de Entrada o Salida */
-   // @NotBlank
+    // @NotBlank
     Boolean entrada;
 
     /* Registro del Punto de Ruta */
     @NotEmpty
     PuntoRuta puntoR;
 
-    public Registro(PuntoRuta _puntoR){
+    public Registro(PuntoRuta _puntoR) {
         this.puntoR = _puntoR;
     }
 

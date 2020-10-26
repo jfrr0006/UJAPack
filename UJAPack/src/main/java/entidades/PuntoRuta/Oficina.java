@@ -12,8 +12,8 @@ public class Oficina extends PuntoRuta {
     @NotBlank
     String oficina;
 
-    public Oficina(int _id, String _nombre,String _centroLog,String _oficina) {
-        super(_id,_nombre);
+    public Oficina(int _id, String _nombre, String _centroLog, String _oficina) {
+        super(_id, _nombre);
         this.oficina = _oficina;
         this.centroLog = _centroLog;
     }

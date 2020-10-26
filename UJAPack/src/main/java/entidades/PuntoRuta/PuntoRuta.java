@@ -17,16 +17,15 @@ public abstract class PuntoRuta {
     /* Conexiones Puntos de Ruta*/
     Map<Integer, PuntoRuta> conexiones;
 
-    public PuntoRuta(int _id,String _nombre){
+    public PuntoRuta(int _id, String _nombre) {
         this.id = _id;
-        this.nombre =_nombre;
+        this.nombre = _nombre;
         this.conexiones = new HashMap<>();
     }
 
     public int getId() {
         return id;
     }
-
 
     public Map<Integer, PuntoRuta> getConexiones() {
         return conexiones;
@@ -37,7 +36,7 @@ public abstract class PuntoRuta {
     }
 
     public void setConexion(PuntoRuta centro) {
-        this.conexiones.put(centro.getId(),centro);
+        this.conexiones.put(centro.getId(), centro);
     }
 
 }

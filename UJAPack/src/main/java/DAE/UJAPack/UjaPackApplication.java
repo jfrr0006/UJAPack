@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-@SpringBootApplication(scanBasePackages="servicios")
+@SpringBootApplication(scanBasePackages = "servicios")
 public class UjaPackApplication {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 	/*	String remi1="Ceuta";
 		String desti1="Barcelona";
 		Float peso1 = 5.0f;
@@ -23,10 +23,10 @@ public class UjaPackApplication {
 		}
 		servicio.avanzarEnvios();
 		servicio.mostrarPrueba(); */
-			SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
-			ApplicationContext context = servidor.run(args);
+        SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
+        ApplicationContext context = servidor.run(args);
 
 
-	}
+    }
 
 }

@@ -1,7 +1,7 @@
-package utils;
+package Utils;
 
 public enum Estado {
     EnTransito,
     EnReparto,
-    Entregado;
+    Entregado
 }

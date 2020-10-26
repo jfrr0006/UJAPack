@@ -8,6 +8,7 @@ import entidades.PuntoRuta.CentroLog;
 import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
 import excepciones.DireccionesIncorrectas;
+import excepciones.LeerJsonIncorrecto;
 
 import javax.validation.constraints.NotBlank;
 import java.io.BufferedReader;
@@ -19,16 +20,15 @@ import java.util.*;
 public class RedUjaPack {
 
 
-
     /*Datos del fichero json*/
     static Map<Integer, PuntoRuta> puntos;
 
-    public RedUjaPack (){
+    public RedUjaPack() {
         puntos = new HashMap<>();
         try {
             leerJson("src\\main\\resources\\redujapack.json");
-        }catch (IOException ex){
-            System.out.println("Error al leer fichero");
+        } catch (IOException ex) {
+            throw new LeerJsonIncorrecto();
         }
 
     }
@@ -44,7 +44,7 @@ public class RedUjaPack {
         StringBuilder strB = new StringBuilder();
         String strA;
 
-        while((strA = br.readLine()) != null){
+        while ((strA = br.readLine()) != null) {
             strB.append(strA);
 
         }
@@ -53,42 +53,42 @@ public class RedUjaPack {
         JsonObject raiz = new Gson().fromJson(jsonStr, JsonObject.class);
         Set<String> centrosLogStr = raiz.getAsJsonObject().keySet();
 
-        for(String centroStr : centrosLogStr){
+        for (String centroStr : centrosLogStr) {
             JsonObject centroJson = raiz.getAsJsonObject(centroStr);
 
             int id = Integer.parseInt(centroStr);
             String nombre = centroJson.get("nombre").toString();
             String localizacion = centroJson.get("localización").toString();
-            CentroLog centroNodo = new CentroLog(id,nombre,localizacion);
+            CentroLog centroNodo = new CentroLog(id, nombre, localizacion);
 
-            puntos.put(id,centroNodo);
+            puntos.put(id, centroNodo);
             JsonArray provincias = centroJson.getAsJsonArray("provincias");
 
-            for( JsonElement provincia : provincias){
-                Oficina oficinaNodo = new Oficina(cont++,nombre,localizacion, provincia.getAsString());
+            for (JsonElement provincia : provincias) {
+                Oficina oficinaNodo = new Oficina(cont++, nombre, localizacion, provincia.getAsString());
                 oficinaNodo.setConexion(centroNodo);
                 centroNodo.setConexion(oficinaNodo);
-                puntos.put(oficinaNodo.getId(),oficinaNodo);
+                puntos.put(oficinaNodo.getId(), oficinaNodo);
 
             }
 
             JsonArray conexionesAux = centroJson.getAsJsonArray("conexiones");
             ArrayList<Integer> conexTmp = new ArrayList<>();
 
-            for(JsonElement conexion : conexionesAux){
+            for (JsonElement conexion : conexionesAux) {
                 conexTmp.add(Integer.parseInt(conexion.getAsString()));
 
             }
 
-            conexiones.put(id,conexTmp);
+            conexiones.put(id, conexTmp);
 
 
         }
 
-        Set<Integer> centrosLogisticosSet =conexiones.keySet();
+        Set<Integer> centrosLogisticosSet = conexiones.keySet();
 
-        for(Integer centro :centrosLogisticosSet){
-            for (Integer con : conexiones.get(centro)){
+        for (Integer centro : centrosLogisticosSet) {
+            for (Integer con : conexiones.get(centro)) {
                 puntos.get(centro).setConexion(puntos.get(con));
 
             }
@@ -98,18 +98,18 @@ public class RedUjaPack {
     }
 
 
-    private void busquedaRec(PuntoRuta actual, PuntoRuta destino,List<List<PuntoRuta>> soluciones,LinkedHashSet<Integer> camino){
+    private void busquedaRec(PuntoRuta actual, PuntoRuta destino, List<List<PuntoRuta>> soluciones, LinkedHashSet<Integer> camino) {
 
         camino.add(actual.getId());
 
-        if(actual.getId() == destino.getId()){
+        if (actual.getId() == destino.getId()) {
             soluciones.add(convertirSetEnLista(camino));
 
-        }else{
-            for(PuntoRuta conexion : actual.getConexiones().values()){
-                if(!camino.contains(conexion.getId())){
+        } else {
+            for (PuntoRuta conexion : actual.getConexiones().values()) {
+                if (!camino.contains(conexion.getId())) {
 
-                    busquedaRec(conexion,destino,soluciones,camino);
+                    busquedaRec(conexion, destino, soluciones, camino);
                 }
             }
         }
@@ -118,27 +118,27 @@ public class RedUjaPack {
 
     private List<PuntoRuta> convertirSetEnLista(LinkedHashSet<Integer> camino) {
         List<PuntoRuta> lista = new ArrayList<>();
-        for (Integer id : camino){
+        for (Integer id : camino) {
             lista.add(puntos.get(id));
         }
         return lista;
     }
 
 
-    private List<PuntoRuta> calcularRuta (PuntoRuta origen, PuntoRuta destino){
+    private List<PuntoRuta> calcularRuta(PuntoRuta origen, PuntoRuta destino) {
 
         List<List<PuntoRuta>> soluciones = new ArrayList<>();
         LinkedHashSet<Integer> camino = new LinkedHashSet<>();
 
-        busquedaRec(origen,destino,soluciones,camino);
+        busquedaRec(origen, destino, soluciones, camino);
 
         int caminoMin = Integer.MAX_VALUE;
         List<PuntoRuta> solucionMin = null;
 
-        for(List<PuntoRuta> solucion : soluciones){
+        for (List<PuntoRuta> solucion : soluciones) {
 
-            if(solucion.size() < caminoMin){
-                caminoMin =solucion.size();
+            if (solucion.size() < caminoMin) {
+                caminoMin = solucion.size();
                 solucionMin = solucion;
 
             }
@@ -149,20 +149,20 @@ public class RedUjaPack {
 
     }
 
-    private int convertirStringEnPuntoRuta(String lugar){
+    private int convertirStringEnPuntoRuta(String lugar) {
 
         for (PuntoRuta value : puntos.values()) {
-            if(value.getLugar().equals(lugar)){
+            if (value.getLugar().equals(lugar)) {
                 return value.getId();
             }
         }
         throw new DireccionesIncorrectas();
     }
 
-    public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario){//Se Borrara o modificará
-        int orig=convertirStringEnPuntoRuta(remitente);
-        int dest=convertirStringEnPuntoRuta(destinatario);
-        return calcularRuta(puntos.get(orig),puntos.get(dest));
+    public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario) {//Se Borrara o modificará
+        int orig = convertirStringEnPuntoRuta(remitente);
+        int dest = convertirStringEnPuntoRuta(destinatario);
+        return calcularRuta(puntos.get(orig), puntos.get(dest));
 
     }
 }
