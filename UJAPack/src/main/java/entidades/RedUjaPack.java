@@ -23,9 +23,13 @@ public class RedUjaPack {
     /*Datos del fichero json*/
     static Map<Integer, PuntoRuta> puntos;
 
-    public RedUjaPack () throws IOException {
+    public RedUjaPack (){
         puntos = new HashMap<>();
-        leerJson("src\\main\\resources\\redujapack.json");
+        try {
+            leerJson("src\\main\\resources\\redujapack.json");
+        }catch (IOException ex){
+            System.out.println("Error al leer fichero");
+        }
 
     }
 
