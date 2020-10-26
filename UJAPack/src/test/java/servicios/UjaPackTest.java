@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import utils.Estado;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -17,13 +16,8 @@ import java.util.List;
 
 class UjaPackTest {
 
-
-    UjaPack servicioUjaPack;
-
     @Autowired
-    UjaPackTest() throws IOException {
-        servicioUjaPack= new UjaPack();
-    }
+    UjaPack servicioUjaPack;
 
     @Test
     public void testServicioUjaPack() {
