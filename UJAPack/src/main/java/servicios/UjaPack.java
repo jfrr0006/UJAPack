@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,8 @@ public class UjaPack {
     /*Mapa con la lista de Envios ordenada por ID*/
     Map<Long, Envio> envios;
 
-    public UjaPack() throws IOException {
+
+    public UjaPack() {
         red = new RedUjaPack();
         envios = new HashMap<>();
 

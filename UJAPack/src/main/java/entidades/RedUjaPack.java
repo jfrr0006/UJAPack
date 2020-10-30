@@ -8,7 +8,6 @@ import entidades.PuntoRuta.CentroLog;
 import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
 import excepciones.DireccionesIncorrectas;
-import excepciones.LeerJsonIncorrecto;
 
 import javax.validation.constraints.NotBlank;
 import java.io.BufferedReader;
@@ -28,7 +27,7 @@ public class RedUjaPack {
         try {
             leerJson("src\\main\\resources\\redujapack.json");
         } catch (IOException ex) {
-            throw new LeerJsonIncorrecto();
+           // throw new LeerJsonIncorrecto(); Provoca fallo en crear el Bean
         }
 
     }
