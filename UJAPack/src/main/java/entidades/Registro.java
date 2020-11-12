@@ -2,21 +2,18 @@ package entidades;
 
 import entidades.PuntoRuta.PuntoRuta;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class Registro {
 
     /* Fecha de Registro */
-    // @NotBlank
     LocalDateTime fecha;
 
     /* Si el Registro es de Entrada o Salida */
-    // @NotBlank
     Boolean entrada;
 
     /* Registro del Punto de Ruta */
-    @NotEmpty
     PuntoRuta puntoR;
 
     public Registro(PuntoRuta _puntoR) {
@@ -35,7 +32,7 @@ public class Registro {
         return puntoR;
     }
 
-    public void actualizarRegistro(LocalDateTime _fecha, Boolean _entrada) {
+    public void actualizarRegistro(@NotNull LocalDateTime _fecha,@NotNull Boolean _entrada) {
         this.entrada = _entrada;
         this.fecha = _fecha;
 

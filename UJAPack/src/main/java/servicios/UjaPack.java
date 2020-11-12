@@ -33,7 +33,17 @@ public class UjaPack {
 
     }
 
-    public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones) {
+    /**
+     * Genera un nuevo envio
+     * @param remitente Nombre del lugar de Inicio del envio
+     * @param destinatario Nombre del lugar de Finalizacion del envio
+     * @param _datos_remitente Datos de la persona que realiza el envio
+     * @param _datos_destinatario Datos de la persona que recibe el envio
+     * @param peso Peso del paquete
+     * @param dimensiones Dimensiones del paquete
+     * @return Nuevo envio creado
+     */
+    public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones,@NotBlank String _datos_remitente, @NotBlank String _datos_destinatario) {
 
         List<PuntoRuta> ruta = red.listaRutaMinima(remitente, destinatario);
         List<Registro> registros = new ArrayList<>();
@@ -46,7 +56,7 @@ public class UjaPack {
         registros.add(new Registro(ruta.get(ruta.size() - 1)));//Metemos el ultimo de nuevo por 3º vez para el registro entregado
         long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
 
-        Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario);
+        Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario,_datos_remitente,_datos_destinatario);
 
         envios.put(number, nuevoEnvio);
 
@@ -58,7 +68,10 @@ public class UjaPack {
 
     }
 
-    public void avanzarEnvios() {//Todos los que no esten ya entregados
+    /**
+     * Avanza todos los envios que no esten ya en estado de Entregado
+     */
+    public void avanzarEnvios() {
         for (Envio envio : envios.values()) {
             if (envio.getEstado() != Estado.Entregado) {
                 registroES(envio);
@@ -68,6 +81,12 @@ public class UjaPack {
         }
     }
 
+    /**
+     * Actualiza el estado actual del envio dependiendo de en que punto de la ruta se encuentre
+     * Actualiza los registros del envio marcando la hora en el que se realiza la entrada o salida
+     * Guardando tambien si es una u otra.
+     * @param envio Envio del cual se va a registrar una entrada o salida
+     */
     private void registroES(Envio envio) {
         Boolean entrada;
         if (envio.getRegistroActual() == 0) {

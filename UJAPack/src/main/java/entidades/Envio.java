@@ -4,6 +4,7 @@ import Utils.Estado;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -11,11 +12,11 @@ import java.util.List;
 public class Envio {
 
     /* Id de envio */
-    @NotBlank
+    @Positive
     long id;
 
     /* Importe */
-    @NotBlank
+    @Positive
     float importe;
 
     /* Lista de Registros de los Puntos */
@@ -23,7 +24,7 @@ public class Envio {
     List<Registro> ruta;
 
     /* Registro Actual */
-    @NotEmpty
+    @NotNull
     int registroActual;
 
     /* Peso */
@@ -42,6 +43,14 @@ public class Envio {
     @NotBlank
     String destinatario;
 
+    /* Datos Remitente */
+    @NotBlank
+    String datos_remitente;
+
+    /* Datos Destinatario */
+    @NotBlank
+    String datos_destinatario;
+
     /* Punto de control donde se notificara */
     @NotBlank
     String notificacion;
@@ -49,7 +58,7 @@ public class Envio {
     /* Estado */
     Estado estado;
 
-    public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario) {
+    public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente, String _datos_destinatario) {
         this.id = _id;
         this.importe = _importe;
         this.ruta = _ruta;
@@ -57,6 +66,8 @@ public class Envio {
         this.dimensiones = _dimensiones;
         this.remitente = _remitente;
         this.destinatario = _destinatario;
+        this.datos_remitente = _datos_remitente;
+        this.datos_destinatario = _datos_destinatario;
         this.estado = Estado.EnTransito;
         this.registroActual = 0;
         this.notificacion = "Ninguna";
@@ -91,8 +102,12 @@ public class Envio {
     public void setEstado(Estado estado) {
         this.estado = estado;
     }
+    /**
+     * Modifica el lugar para notificar cuando llegue/salga de este
+     * @param notificacion el nombre del Punto de Ruta, EJ: Ceuta
+     */
 
-    public void setNotificacion(String notificacion) {
+    public void setNotificacion(@NotBlank String notificacion) {
         this.notificacion = notificacion;
     }
 

@@ -1,13 +1,14 @@
 package entidades.PuntoRuta;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class PuntoRuta {
 
     /* Int ID */
-    @NotBlank
+    @Positive
     int id;
 
     /* Nombre */

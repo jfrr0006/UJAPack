@@ -31,10 +31,18 @@ public class RedUjaPack {
         }
 
     }
+    /**
+     * Lee el Json de Puntos de Ruta
+     * @param file el nombre del archivo
+     */
 
     private static void leerJson(String file) throws IOException {
 
         Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
+        /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
+       * Pero en realidad si tuvieramos pensamiento de meter mas centros lo suyo seria que los indices de las oficinas empezaran
+       * en un lugar mas avanzado EJ:100,200
+       */
         int cont = 11;
 
         FileReader fr = new FileReader(file);
@@ -96,7 +104,13 @@ public class RedUjaPack {
 
     }
 
-
+    /**
+     * Busqueda Recursiva de caminos hacia una solucion
+     * @param actual Punto de Ruta actual en la busqueda
+     * @param destino Punto de Ruta final que deseamos alcanzar
+     * @param camino Set de ID's de Puntos de Ruta, se asegura no repetir punto en el proceso de crear un camino
+     * @param soluciones La lista que contiene los caminos desde actual hasta destino encontrados.
+     */
     private void busquedaRec(PuntoRuta actual, PuntoRuta destino, List<List<PuntoRuta>> soluciones, LinkedHashSet<Integer> camino) {
 
         camino.add(actual.getId());
@@ -114,7 +128,11 @@ public class RedUjaPack {
         }
         camino.remove(actual.getId());
     }
-
+    /**
+     * Transforma un set de enteros en una lista de Puntos de Ruta
+     * @param camino Set de ID's de Puntos de Ruta, se asegura no repetir punto en el proceso de crear un camino
+     * @return La lista de Puntos de Ruta
+     */
     private List<PuntoRuta> convertirSetEnLista(LinkedHashSet<Integer> camino) {
         List<PuntoRuta> lista = new ArrayList<>();
         for (Integer id : camino) {
@@ -123,6 +141,12 @@ public class RedUjaPack {
         return lista;
     }
 
+    /**
+     * Calculo de la ruta Minima desde un punto de ruta a otro
+     * @param origen Punto de Ruta desde el cual inicia  la busqueda
+     * @param destino Punto de Ruta final que deseamos alcanzar
+     * @return El camino minimo encontrado
+     */
 
     private List<PuntoRuta> calcularRuta(PuntoRuta origen, PuntoRuta destino) {
 
@@ -147,7 +171,11 @@ public class RedUjaPack {
         return solucionMin;
 
     }
-
+    /**
+     * Dado un String busca este en los Puntos de Ruta y si existe devuelve el ID entero del punto
+     * @param lugar Nombre del punto de ruta
+     * @return ID del punto de ruta
+     */
     private int convertirStringEnPuntoRuta(String lugar) {
 
         for (PuntoRuta value : puntos.values()) {
@@ -157,11 +185,15 @@ public class RedUjaPack {
         }
         throw new DireccionesIncorrectas();
     }
-
-    public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario) {//Se Borrara o modificará
-        int orig = convertirStringEnPuntoRuta(remitente);
-        int dest = convertirStringEnPuntoRuta(destinatario);
-        return calcularRuta(puntos.get(orig), puntos.get(dest));
+    /**
+     * Dado dos Strings, uno del punto de incio del envio
+     * y otro del lugar al que se desea mandar devuelve la ruta minima de Puntos de Ruta
+     * @param remitente Nombre del punto de ruta de Inicio
+     * @param destinatario Nombre del punto de ruta de Finalizacion
+     * @return Lista de Puntos de Ruta, el camino minimo
+     */
+    public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario) {
+        return calcularRuta(puntos.get(convertirStringEnPuntoRuta(remitente)), puntos.get(convertirStringEnPuntoRuta(destinatario)));
 
     }
 }

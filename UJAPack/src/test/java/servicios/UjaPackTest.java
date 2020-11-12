@@ -29,9 +29,11 @@ class UjaPackTest {
     void generarEnvioTest() {
         String remi1 = "Ceuta";
         String desti1 = "Barcelona";
+        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
+        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
         Float peso1 = 5.0f;
         Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1);
+        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
 
         Assertions.assertThat(envio.getId()).isNotNull();
         Assertions.assertThat(envio.getImporte()).isNotNull();
@@ -44,10 +46,12 @@ class UjaPackTest {
     void notificacionPuntoControl() {
         String remi1 = "Ceuta";
         String desti1 = "Barcelona";
+        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
+        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
         String notificacion = "Barcelona";
         Float peso1 = 5.0f;
         Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1);
+        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
         servicioUjaPack.activarNotificacion(envio.getId(), notificacion);
         for (int i = 0; i < envio.getRuta().size() + 2; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
             servicioUjaPack.avanzarEnvios();
@@ -65,9 +69,11 @@ class UjaPackTest {
     void obtenerSituacionEnvio() {
         String remi1 = "Ceuta";
         String desti1 = "Barcelona";
+        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
+        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
         Float peso1 = 5.0f;
         Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1);
+        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
         for (int i = 0; i < envio.getRuta().size() / 2; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
             servicioUjaPack.avanzarEnvios();
 
