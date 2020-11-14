@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Validated
@@ -25,12 +26,14 @@ public class UjaPack {
     RedUjaPack red;
     /*Mapa con la lista de Envios ordenada por ID*/
     Map<Long, Envio> envios;
+    /*Mapa con la lista de Envios Extraviados ordenada por ID*/
+    Map<Long, Envio> enviosExtraviados;
 
 
     public UjaPack() {
         red = new RedUjaPack();
         envios = new HashMap<>();
-
+        enviosExtraviados = new HashMap<>();
     }
 
     /**
@@ -105,6 +108,10 @@ public class UjaPack {
 
     }
 
+    /**
+     * Actualiza los estados de los envios si cumplen las condiciones
+     * @param envio Envio del cual se va a actualizar el estado si cumple con las condiciones
+     */
 
     private void actualizarEstadoEnvio(Envio envio) {
         //Actualizar Estado
@@ -116,6 +123,89 @@ public class UjaPack {
             envio.setEstado(Estado.Entregado);
 
         }
+    }
+
+    /**
+     * Funcion funciona solo a las 00:00:00, inspecciona a los pedidos en transito
+     * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
+     */
+    public void actualizarEnviosExtraviados(LocalDateTime ahora){
+        /*Ahora mismo la dejamos publica para usarla en los Tests
+         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
+        if(ahora.getHour()==0 && ahora.getMinute()==0 && ahora.getSecond()==0){
+            for (Envio envio : envios.values()) {
+                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual()!=0) {
+                    LocalDateTime ultimoRegistro = (envio.getRuta().get(envio.getRegistroActual()-1)).getFecha();
+                    long dias=ChronoUnit.DAYS.between(ultimoRegistro,ahora);
+                    if(dias>7){
+                        envio.setEstado(Estado.Extraviado);
+                        enviosExtraviados.put(envio.getId(),envio);
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Busca los envios extraviados en un intervalo de tiempo
+     * @param desde Fecha desde donde se quiere buscar
+     * @param hasta Fecha hasta donde se quiere buscar
+     * @return Lista de envios extraviados dentro del intervalo de tiempo
+     */
+    public List<Envio> consultarEnviosExtraviados(LocalDateTime desde,LocalDateTime hasta){
+        List<Envio> extraviados = new ArrayList<>();
+        for (Envio envio: enviosExtraviados.values()
+             ) {
+            LocalDateTime ultimoRegistro=envio.getRuta().get(envio.getRegistroActual()-1).getFecha();
+            if(ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta) ){
+                extraviados.add(envio);
+
+
+            }
+
+        }
+
+
+        return extraviados;
+    }
+
+    /**
+     * @return Lista de todos los envios extraviados
+     */
+    public List<Envio> consultarEnviosExtraviados(){
+        return new ArrayList<>(enviosExtraviados.values());
+
+    }
+
+    /**
+     * Calcula el porcentaje de envios extraviados en el ultimo periodo de tiempo seleccionado
+     * @param ultimo Opcion seleccionada por el usuario dia/mes/año
+     * @return Porcentaje de envios extraviados
+     */
+    public double porcentajeEnviosExtraviados(String ultimo){
+        //El Switch es pensando en un desplegable de opciones limitadas
+        double porcentaje=0;
+        List<Envio> extraviados;
+        LocalDateTime ahora = LocalDateTime.now();
+        switch (ultimo){
+
+            case "dia":
+                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.DAYS),ahora).size()/envios.values().size())*100;
+                break;
+
+            case "mes":
+                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.MONTHS),ahora).size()/envios.values().size())*100;
+                break;
+
+            case "anio":
+                extraviados= consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.YEARS),ahora);
+                porcentaje=((double) extraviados.size()/envios.values().size())*100;
+                break;
+
+        }
+
+        return porcentaje;
     }
 
     private String mandarNotificacion(Envio envio) {
@@ -130,6 +220,11 @@ public class UjaPack {
         return "El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion();
     }
 
+    /**
+     * Activa la notificacion en un envio
+     * @param idenvio ID del envio
+     * @param noti Punto donde se quiere tener una notificacion de su llegada/salida
+     */
     public void activarNotificacion(long idenvio, String noti) {
         Boolean existe = false;
         for (Registro regis : envios.get(idenvio).getRuta()) {
@@ -146,6 +241,11 @@ public class UjaPack {
 
     }
 
+    /**
+     * Devuelve la situacion actual del envio
+     * @param idenvio ID del envio
+     * @return Cadena de texto con la informacion
+     */
     public String situacionActualEnvio(long idenvio) {
         String es;
         List<Registro> ruta = envios.get(idenvio).getRuta();
@@ -159,6 +259,11 @@ public class UjaPack {
 
     }
 
+    /**
+     * Devuelve toda la informacion sobre la ruta de un pedido(hasta el momento o ya finalizado)
+     * @param idenvio ID del envio
+     * @return Cadena de texto con la informacion
+     */
     public List<String> listadoRutaEnvio(long idenvio) {
         String es;
         List<String> registros = new ArrayList<>();
