@@ -1,7 +1,9 @@
 package entidades.PuntoRuta;
 
+import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
+@Entity
 public class CentroLog extends PuntoRuta {
 
     /* Localizacion */
@@ -11,6 +13,10 @@ public class CentroLog extends PuntoRuta {
     public CentroLog(int _id, String _nombre, String _localizacion) {
         super(_id, _nombre);
         this.localizacion = _localizacion;
+
+    }
+
+    public CentroLog() {
 
     }
 

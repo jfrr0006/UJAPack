@@ -2,16 +2,17 @@ package entidades;
 
 import Utils.Estado;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-
+@Entity
 public class Envio {
 
     /* Id de envio */
+    @Id
     @Positive
     long id;
 
@@ -20,7 +21,8 @@ public class Envio {
     float importe;
 
     /* Lista de Registros de los Puntos */
-    @NotEmpty
+    @OneToMany
+    @JoinColumn(name = "envioId")
     List<Registro> ruta;
 
     /* Registro Actual */
@@ -71,6 +73,10 @@ public class Envio {
         this.estado = Estado.EnTransito;
         this.registroActual = 0;
         this.notificacion = "Ninguna";
+
+    }
+
+    public Envio() {
 
     }
 

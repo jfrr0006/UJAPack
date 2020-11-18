@@ -2,12 +2,16 @@ package servicios;
 
 import DAE.UJAPack.UjaPackApplication;
 import Utils.Estado;
+import beans.UjaPack;
 import entidades.Envio;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -16,6 +20,7 @@ import static org.assertj.core.api.Assertions.within;
 
 
 @SpringBootTest(classes = UjaPackApplication.class)
+@ActiveProfiles(profiles = "test")
 class UjaPackTest {
 
     @Autowired
@@ -28,8 +33,13 @@ class UjaPackTest {
 
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void generarEnvioTest() {
+
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         String remi1 = "Ceuta";
         String desti1 = "Barcelona";
         String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
@@ -172,11 +182,11 @@ class UjaPackTest {
 
         LocalDateTime ahora = LocalDateTime.parse("2020-12-31T00:00:00");
         servicioUjaPack.actualizarEnviosExtraviados(ahora);
+        double enviosExtr=servicioUjaPack.porcentajeEnviosExtraviados("dia");
 
-
-        Assertions.assertThat(servicioUjaPack.porcentajeEnviosExtraviados("dia")).isCloseTo(66.66,within(0.1));
-        Assertions.assertThat(servicioUjaPack.porcentajeEnviosExtraviados("dia")).isPositive();
-        Assertions.assertThat(servicioUjaPack.porcentajeEnviosExtraviados("dia")).isLessThan(100);
+        Assertions.assertThat(enviosExtr).isCloseTo(66.66,within(0.1));
+        Assertions.assertThat(enviosExtr).isPositive();
+        Assertions.assertThat(enviosExtr).isLessThan(100);
 
 
     }
