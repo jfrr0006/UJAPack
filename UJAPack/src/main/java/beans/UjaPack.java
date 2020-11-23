@@ -168,11 +168,12 @@ public class UjaPack implements ServicioUjaPack {
         if(ahora.getHour()==0 && ahora.getMinute()==0 && ahora.getSecond()==0){
             for (Envio envio : repoEnvios.listEnvios()) {
                 if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual()!=0) {
-                    LocalDateTime ultimoRegistro = (envio.getRuta().get(envio.getRegistroActual()-1)).getFecha();
+                    LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual()-1)).getFecha();
                     long dias=ChronoUnit.DAYS.between(ultimoRegistro,ahora);
                     if(dias>7){
                         envio.setEstado(Estado.Extraviado);
-                        repoEnviosExtraviados.insertar(envio);
+                        // repoEnviosExtraviados.insertar(envio);
+                        repoEnvios.actualizar(envio);
 
                     }
                 }
@@ -209,7 +210,7 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     public List<Envio> consultarEnviosExtraviados(){
-        return new ArrayList<>(repoEnviosExtraviados.listEnvios());
+        return new ArrayList<>(repoEnvios.listEnvios());
 
     }
 
@@ -288,7 +289,7 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     public String situacionActualEnvio(long idenvio) {
         String es;
-        List<Registro> ruta = repoEnvios.buscar(idenvio).getRuta();
+        List<Registro> ruta = repoEnvios.listRuta(idenvio);
         int registroActual = repoEnvios.buscar(idenvio).getRegistroActual() - 1;
         if (ruta.get(registroActual).getEntrada()) {
             es = "Ha entrado a ";
@@ -309,7 +310,7 @@ public class UjaPack implements ServicioUjaPack {
         String es;
         List<String> registros = new ArrayList<>();
         int cont = 0;
-        List<Registro> ruta = repoEnvios.buscar(idenvio).getRuta();
+        List<Registro> ruta = repoEnvios.listRuta(idenvio);
 
         while (ruta.get(cont).getFecha() != null) {
 
@@ -324,6 +325,7 @@ public class UjaPack implements ServicioUjaPack {
 
         return registros;
     }
+
 
     /**
      * Lee el Json de Puntos de Ruta

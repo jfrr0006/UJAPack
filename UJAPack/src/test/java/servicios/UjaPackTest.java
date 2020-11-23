@@ -80,16 +80,15 @@ class UjaPackTest {
     }
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void obtenerSituacionEnvio() {
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
-        for (int i = 0; i < envio.getRuta().size() / 2; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
             servicioUjaPack.avanzarEnvios();
 
         }
@@ -103,24 +102,25 @@ class UjaPackTest {
 
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void generarEnvioExtraviado() {
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
-        for (int i = 0; i < envio.getRuta().size() / 2; i++) {//Mitad del camino
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
 
         }
-        LocalDateTime ahora = LocalDateTime.parse("2020-12-31T00:00:00");
-        servicioUjaPack.actualizarEnviosExtraviados(ahora);
+
+        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
+        envio=servicioUjaPack.verEnvio(envio.getId());
+        List<Envio> enviosExtra=servicioUjaPack.consultarEnviosExtraviados();
 
         Assertions.assertThat(envio.getEstado()).isEqualByComparingTo(Estado.Extraviado);
-        Assertions.assertThat(servicioUjaPack.consultarEnviosExtraviados()).isNotEmpty();
+        Assertions.assertThat(enviosExtra).isNotEmpty();
 
     }
 
