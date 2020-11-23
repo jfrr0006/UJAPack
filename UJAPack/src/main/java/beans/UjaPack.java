@@ -66,6 +66,7 @@ public class UjaPack implements ServicioUjaPack {
 
         long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
         Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario,_datos_remitente,_datos_destinatario);
+        repoEnvios.insertar(nuevoEnvio);
 
         for (PuntoRuta punto : ruta) {
             Registro aux1=new Registro(punto);
@@ -96,6 +97,7 @@ public class UjaPack implements ServicioUjaPack {
      * Avanza todos los envios que no esten ya en estado de Entregado
      */
     @Override
+    @Transactional
     public void avanzarEnvios() {
         for (Envio envio : repoEnvios.listEnvios()) {
             if (envio.getEstado() != Estado.Entregado) {
@@ -104,6 +106,14 @@ public class UjaPack implements ServicioUjaPack {
             }
 
         }
+    }
+
+    @Override
+    @Transactional
+    public Envio verEnvio(long id) {
+        Envio envio = repoEnvios.buscar(id);//meterle throw
+        envio.getRuta().size();
+        return envio;
     }
 
     /**
@@ -254,14 +264,16 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     public void activarNotificacion(long idenvio, String noti) {
         Boolean existe = false;
-        for (Registro regis : repoEnvios.buscar(idenvio).getRuta()) {
+        for (Registro regis : repoEnvios.listRuta(idenvio)) {
             if (noti.equals(regis.getPuntoR().getLugar())) {
                 existe = true;
                 break;
             }
         }
         if (existe) {
-            repoEnvios.buscar(idenvio).setNotificacion(noti);
+            Envio envi=repoEnvios.buscar(idenvio);
+            envi.setNotificacion(noti);
+            repoEnvios.actualizar(envi);
         } else {
             throw new DirNotificacionIncorrecta();
         }
@@ -320,73 +332,73 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     @Transactional
     public void leerJson(String file) throws IOException {//primero en un mapa y luego de una vez en la base de datos mediante el repositorio
+        if(repoPuntosRuta.listPuntosRuta().isEmpty()) {
+            Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
+            /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
+             * Pero en realidad si tuvieramos pensamiento de meter mas centros lo suyo seria que los indices de las oficinas empezaran
+             * en un lugar mas avanzado EJ:100,200
+             */
+            int cont = 11;
 
-        Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
-        /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
-         * Pero en realidad si tuvieramos pensamiento de meter mas centros lo suyo seria que los indices de las oficinas empezaran
-         * en un lugar mas avanzado EJ:100,200
-         */
-        int cont = 11;
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
 
-        FileReader fr = new FileReader(file);
-        BufferedReader br = new BufferedReader(fr);
+            StringBuilder strB = new StringBuilder();
+            String strA;
 
-        StringBuilder strB = new StringBuilder();
-        String strA;
-
-        while ((strA = br.readLine()) != null) {
-            strB.append(strA);
-
-        }
-
-        String jsonStr = strB.toString();
-        JsonObject raiz = new Gson().fromJson(jsonStr, JsonObject.class);
-        Set<String> centrosLogStr = raiz.getAsJsonObject().keySet();
-
-        for (String centroStr : centrosLogStr) {
-            JsonObject centroJson = raiz.getAsJsonObject(centroStr);
-
-            int id = Integer.parseInt(centroStr);
-            String nombre = centroJson.get("nombre").toString();
-            String localizacion = centroJson.get("localización").toString();
-            CentroLog centroNodo = new CentroLog(id, nombre, localizacion);
-
-            repoPuntosRuta.insertar(centroNodo);
-            JsonArray provincias = centroJson.getAsJsonArray("provincias");
-
-            for (JsonElement provincia : provincias) {
-                Oficina oficinaNodo = new Oficina(cont++, nombre, localizacion, provincia.getAsString());
-                oficinaNodo.setConexion(centroNodo);
-                centroNodo.setConexion(oficinaNodo);
-                repoPuntosRuta.insertar(oficinaNodo);
-               // repoPuntosRuta.actualizar(centroNodo);
+            while ((strA = br.readLine()) != null) {
+                strB.append(strA);
 
             }
 
-            JsonArray conexionesAux = centroJson.getAsJsonArray("conexiones");
-            ArrayList<Integer> conexTmp = new ArrayList<>();
+            String jsonStr = strB.toString();
+            JsonObject raiz = new Gson().fromJson(jsonStr, JsonObject.class);
+            Set<String> centrosLogStr = raiz.getAsJsonObject().keySet();
 
-            for (JsonElement conexion : conexionesAux) {
-                conexTmp.add(Integer.parseInt(conexion.getAsString()));
+            for (String centroStr : centrosLogStr) {
+                JsonObject centroJson = raiz.getAsJsonObject(centroStr);
+
+                int id = Integer.parseInt(centroStr);
+                String nombre = centroJson.get("nombre").toString();
+                String localizacion = centroJson.get("localización").toString();
+                CentroLog centroNodo = new CentroLog(id, nombre, localizacion);
+
+                repoPuntosRuta.insertar(centroNodo);
+                JsonArray provincias = centroJson.getAsJsonArray("provincias");
+
+                for (JsonElement provincia : provincias) {
+                    Oficina oficinaNodo = new Oficina(cont++, nombre, localizacion, provincia.getAsString());
+                    oficinaNodo.setConexion(centroNodo);
+                    centroNodo.setConexion(oficinaNodo);
+                    repoPuntosRuta.insertar(oficinaNodo);
+                    // repoPuntosRuta.actualizar(centroNodo);
+
+                }
+
+                JsonArray conexionesAux = centroJson.getAsJsonArray("conexiones");
+                ArrayList<Integer> conexTmp = new ArrayList<>();
+
+                for (JsonElement conexion : conexionesAux) {
+                    conexTmp.add(Integer.parseInt(conexion.getAsString()));
+
+                }
+
+                conexiones.put(id, conexTmp);
+
 
             }
 
-            conexiones.put(id, conexTmp);
+            Set<Integer> centrosLogisticosSet = conexiones.keySet();
 
+            for (Integer centro : centrosLogisticosSet) {
+                for (Integer con : conexiones.get(centro)) {
+                    repoPuntosRuta.buscar(centro).setConexion(repoPuntosRuta.buscar(con));
+                    //   repoPuntosRuta.actualizar(aux);
 
-        }
-
-        Set<Integer> centrosLogisticosSet = conexiones.keySet();
-
-        for (Integer centro : centrosLogisticosSet) {
-            for (Integer con : conexiones.get(centro)) {
-                repoPuntosRuta.buscar(centro).setConexion(repoPuntosRuta.buscar(con));
-             //   repoPuntosRuta.actualizar(aux);
+                }
 
             }
-
         }
-
     }
 
     /**

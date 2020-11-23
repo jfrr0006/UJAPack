@@ -40,13 +40,16 @@ class UjaPackTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+     /*
+     Entendemos que es mas limpio meterlos directamente inline en generar envio, pero vamos a dejar esto en comentario como leyenda
+        String remitente = "Ceuta";
+        String destinatario = "Barcelona";
+        String datos_remitente="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
+        String datos_destinatario="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
+        Float peso = 5.0f;
+        Float dimensiones = 10.0f;
+      */
+        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
 
         Assertions.assertThat(envio.getId()).isNotNull();
         Assertions.assertThat(envio.getImporte()).isNotNull();
@@ -55,22 +58,21 @@ class UjaPackTest {
     }
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void notificacionPuntoControl() {
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        String notificacion = "Barcelona";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
-        servicioUjaPack.activarNotificacion(envio.getId(), notificacion);
-        for (int i = 0; i < envio.getRuta().size() + 2; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.activarNotificacion(envio.getId(), "Barcelona");
+
+        for (int i = 0; i < 25; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
             servicioUjaPack.avanzarEnvios();
 
         }
-
+        envio=servicioUjaPack.verEnvio(envio.getId());
         Assertions.assertThat(envio.getEstado()).isEqualByComparingTo(Estado.Entregado);//Nos aseguramos que ha sido entregado
         Assertions.assertThat(envio.getRuta()).isNotEmpty();
         Assertions.assertThat(envio).isNotNull();

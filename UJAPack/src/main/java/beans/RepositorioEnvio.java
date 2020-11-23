@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -53,6 +54,17 @@ public class RepositorioEnvio {
 
     }
 
+    /**
+     * Devuelve la lista de registros de la ruta de un envio
+     * @return listado Registros
+     */
+    public List<Registro> listRuta(long envio){
+
+        Envio envi =em.find(Envio.class, envio);
+
+        return  new ArrayList<>(envi.getRuta());
+
+    }
 
 
 }

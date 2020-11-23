@@ -91,4 +91,10 @@ public interface ServicioUjaPack {
      * @param file el nombre del archivo
      */
     public void leerJson(String file)throws IOException;
+
+    /**
+     * Devuelve un envio
+     * @param id del envio
+     */
+    public Envio verEnvio(long id);
 }
