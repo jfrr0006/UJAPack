@@ -32,8 +32,8 @@ public class UjaPack implements ServicioUjaPack {
     @Autowired
     private RepositorioEnvio repoEnvios;
 
-    @Autowired
-    private RepositorioEnvio repoEnviosExtraviados;
+  //  @Autowired
+ //   private RepositorioEnvio repoEnviosExtraviados;
 
     @Autowired
     private RepositorioPuntoRuta repoPuntosRuta;
@@ -111,9 +111,9 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     @Transactional
     public Envio verEnvio(long id) {
-        Envio envio = repoEnvios.buscar(id);//meterle throw
-        envio.getRuta().size();
-        return envio;
+       Envio envio = repoEnvios.buscar(id);//meterle throw
+       envio.getRuta().size();
+       return envio;
     }
 
     /**
@@ -172,7 +172,7 @@ public class UjaPack implements ServicioUjaPack {
                     long dias=ChronoUnit.DAYS.between(ultimoRegistro,ahora);
                     if(dias>7){
                         envio.setEstado(Estado.Extraviado);
-                        // repoEnviosExtraviados.insertar(envio);
+                       // repoEnviosExtraviados.insertar(envio);
                         repoEnvios.actualizar(envio);
 
                     }
@@ -190,9 +190,8 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     public List<Envio> consultarEnviosExtraviados(LocalDateTime desde,LocalDateTime hasta){
         List<Envio> extraviados = new ArrayList<>();
-        for (Envio envio: repoEnviosExtraviados.listEnvios()
-             ) {
-            LocalDateTime ultimoRegistro=envio.getRuta().get(envio.getRegistroActual()-1).getFecha();
+        for (Envio envio: repoEnvios.listEnviosExtraviados()) {
+            LocalDateTime ultimoRegistro=repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual()-1).getFecha();
             if(ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta) ){
                 extraviados.add(envio);
 
@@ -210,7 +209,7 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     public List<Envio> consultarEnviosExtraviados(){
-        return new ArrayList<>(repoEnvios.listEnvios());
+        return new ArrayList<>(repoEnvios.listEnviosExtraviados());
 
     }
 
@@ -236,8 +235,7 @@ public class UjaPack implements ServicioUjaPack {
                 break;
 
             case "anio":
-                extraviados= consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.YEARS),ahora);
-                porcentaje=((double) extraviados.size()/repoEnvios.listEnvios().size())*100;
+                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.YEARS),ahora).size()/repoEnvios.listEnvios().size())*100;
                 break;
 
         }
@@ -326,7 +324,6 @@ public class UjaPack implements ServicioUjaPack {
         return registros;
     }
 
-
     /**
      * Lee el Json de Puntos de Ruta
      * @param file el nombre del archivo
@@ -334,7 +331,7 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     @Transactional
     public void leerJson(String file) throws IOException {//primero en un mapa y luego de una vez en la base de datos mediante el repositorio
-        if(repoPuntosRuta.listPuntosRuta().isEmpty()) {
+    if(repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
             /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
              * Pero en realidad si tuvieramos pensamiento de meter mas centros lo suyo seria que los indices de las oficinas empezaran

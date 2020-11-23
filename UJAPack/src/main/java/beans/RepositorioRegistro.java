@@ -30,5 +30,12 @@ public class RepositorioRegistro {
         em.remove(em.merge(registro));
     }
 
+  /*  public List<Registro> listRuta(long id_envio) {
 
+        List<Registro> ruta = em.createQuery("Select r from Registro r ", Registro.class).getResultList();
+
+        return ruta;
+
+    }
+    */
 }

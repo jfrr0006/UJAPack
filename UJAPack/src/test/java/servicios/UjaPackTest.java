@@ -8,7 +8,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
@@ -68,7 +67,7 @@ class UjaPackTest {
         Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.activarNotificacion(envio.getId(), "Barcelona");
 
-        for (int i = 0; i < 25; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
+        for (int i = 0; i < envio.getRuta().size() + 20; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
             servicioUjaPack.avanzarEnvios();
 
         }
@@ -125,31 +124,24 @@ class UjaPackTest {
     }
 
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void consultaEnviosExtraviados() {
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        remi1 = "Madrid";
-        desti1 = "Barcelona";
-        Envio envio2 = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+       servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+       servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
 
-        for (int i = 0; i < envio.getRuta().size() / 2; i++) {//Mitad del camino
+        for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
 
         }
 
-        remi1 = "Barcelona";
-        desti1 = "Toledo";
-        Envio envio3 = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+        Envio envio3 = servicioUjaPack.generarEnvio("Barcelona", "Toledo", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
 
-        LocalDateTime ahora = LocalDateTime.parse("2020-12-31T00:00:00");
-        servicioUjaPack.actualizarEnviosExtraviados(ahora);
+        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
 
 
         Assertions.assertThat(envio3.getEstado()).isNotEqualByComparingTo(Estado.Extraviado);
@@ -159,34 +151,28 @@ class UjaPackTest {
 
     }
     @Test
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void consultaPorcentajeEnviosExtraviados() {
-        String remi1 = "Ceuta";
-        String desti1 = "Barcelona";
-        String datos_remi1="Gepeto Marin - Atlantida 66667 - Calle Falsa 123";
-        String datos_desti1="Pinocho Marin - Ballena 66668 - Avenida Esofago 123";
-        Float peso1 = 5.0f;
-        Float dimen1 = 10.0f;
-        Envio envio = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+        try {
+            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        remi1 = "Madrid";
-        desti1 = "Barcelona";
-        Envio envio2 = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
+        servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
 
-        for (int i = 0; i < envio.getRuta().size() / 2; i++) {//Mitad del camino
+        for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
 
         }
 
-        remi1 = "Barcelona";
-        desti1 = "Toledo";
-        Envio envio3 = servicioUjaPack.generarEnvio(remi1, desti1, peso1, dimen1,datos_remi1,datos_desti1);
 
-        LocalDateTime ahora = LocalDateTime.parse("2020-12-31T00:00:00");
-        servicioUjaPack.actualizarEnviosExtraviados(ahora);
+        servicioUjaPack.generarEnvio("Barcelona", "Toledo", 5.0f,  10.0f,"Gepeto Marin - Atlantida 66667 - Calle Falsa 123","Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+
+        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
         double enviosExtr=servicioUjaPack.porcentajeEnviosExtraviados("dia");
 
-        Assertions.assertThat(enviosExtr).isCloseTo(66.66,within(0.1));
+        Assertions.assertThat(enviosExtr).isCloseTo(66.66,within(0.1)); //Si no se borra la base de datos antes de este test, fallara porque esta hecho para que sean 2/3 extraviados
         Assertions.assertThat(enviosExtr).isPositive();
         Assertions.assertThat(enviosExtr).isLessThan(100);
 

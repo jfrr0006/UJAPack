@@ -46,6 +46,22 @@ public class RepositorioEnvio {
         return envios;
 
     }
+
+    /**
+     * Devolver todos los Envios Extraviados
+     *
+     * @return listado de envios con estado extraviado
+     */
+    public List<Envio> listEnviosExtraviados() {
+
+        List<Envio> envios = em.createQuery("Select e from Envio e where e.estado = 3", Envio.class).getResultList();
+
+        return envios;
+
+    }
+    /**
+     * Añade un registro a la ruta de un envio
+     */
     public void añadirRegistro(Envio envio, Registro registro){
 
         Envio cuentaEnlazada = em.merge(envio);
@@ -53,7 +69,6 @@ public class RepositorioEnvio {
         cuentaEnlazada.getRuta().add(registro);
 
     }
-
     /**
      * Devuelve la lista de registros de la ruta de un envio
      * @return listado Registros
@@ -65,6 +80,7 @@ public class RepositorioEnvio {
         return  new ArrayList<>(envi.getRuta());
 
     }
+
 
 
 }
