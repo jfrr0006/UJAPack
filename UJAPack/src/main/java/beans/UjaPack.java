@@ -32,15 +32,14 @@ public class UjaPack implements ServicioUjaPack {
     @Autowired
     private RepositorioEnvio repoEnvios;
 
-  //  @Autowired
- //   private RepositorioEnvio repoEnviosExtraviados;
+    //  @Autowired
+    //   private RepositorioEnvio repoEnviosExtraviados;
 
     @Autowired
     private RepositorioPuntoRuta repoPuntosRuta;
 
     @Autowired
     private RepositorioRegistro repoRegistro;
-
 
 
     public UjaPack() {
@@ -50,38 +49,39 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Genera un nuevo envio
-     * @param remitente Nombre del lugar de Inicio del envio
-     * @param destinatario Nombre del lugar de Finalizacion del envio
-     * @param _datos_remitente Datos de la persona que realiza el envio
+     *
+     * @param remitente           Nombre del lugar de Inicio del envio
+     * @param destinatario        Nombre del lugar de Finalizacion del envio
+     * @param _datos_remitente    Datos de la persona que realiza el envio
      * @param _datos_destinatario Datos de la persona que recibe el envio
-     * @param peso Peso del paquete
-     * @param dimensiones Dimensiones del paquete
+     * @param peso                Peso del paquete
+     * @param dimensiones         Dimensiones del paquete
      * @return Nuevo envio creado
      */
     @Override
-    public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones,@NotBlank String _datos_remitente, @NotBlank String _datos_destinatario) {
+    public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones, @NotBlank String _datos_remitente, @NotBlank String _datos_destinatario) {
 
         List<PuntoRuta> ruta = listaRutaMinima(remitente, destinatario);
         List<Registro> registros = new ArrayList<>();
 
         long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
-        Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario,_datos_remitente,_datos_destinatario);
+        Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
         repoEnvios.insertar(nuevoEnvio);
 
         for (PuntoRuta punto : ruta) {
-            Registro aux1=new Registro(punto);
-            Registro aux2=new Registro(punto);
+            Registro aux1 = new Registro(punto);
+            Registro aux2 = new Registro(punto);
 
             repoRegistro.insertar(aux1);
             repoRegistro.insertar(aux2);
-            repoEnvios.añadirRegistro(nuevoEnvio,aux1);
-            repoEnvios.añadirRegistro(nuevoEnvio,aux2);
+            repoEnvios.añadirRegistro(nuevoEnvio, aux1);
+            repoEnvios.añadirRegistro(nuevoEnvio, aux2);
 
 
         }
         Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
         repoRegistro.insertar(aux3);
-        repoEnvios.añadirRegistro(nuevoEnvio,aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado //Transac
+        repoEnvios.añadirRegistro(nuevoEnvio, aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado //Transac
 
         repoEnvios.actualizar(nuevoEnvio);
 
@@ -111,15 +111,16 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     @Transactional
     public Envio verEnvio(long id) {
-       Envio envio = repoEnvios.buscar(id);//meterle throw
-       envio.getRuta().size();
-       return envio;
+        Envio envio = repoEnvios.buscar(id);//meterle throw
+        envio.getRuta().size();
+        return envio;
     }
 
     /**
      * Actualiza el estado actual del envio dependiendo de en que punto de la ruta se encuentre
      * Actualiza los registros del envio marcando la hora en el que se realiza la entrada o salida
      * Guardando tambien si es una u otra.
+     *
      * @param envio Envio del cual se va a registrar una entrada o salida
      */
     private void registroES(Envio envio) {
@@ -142,16 +143,17 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Actualiza los estados de los envios si cumplen las condiciones
+     *
      * @param envio Envio del cual se va a actualizar el estado si cumple con las condiciones
      */
 
     private void actualizarEstadoEnvio(Envio envio) {
         //Actualizar Estado
-        if (envio.getRegistroActual() == envio.getRuta().size() - 2) {
+        if (envio.getRegistroActual() == envio.getRuta().size() - 1) {
             envio.setEstado(Estado.EnReparto);
 
         }
-        if (envio.getRegistroActual() == envio.getRuta().size() - 1) {
+        if (envio.getRegistroActual() == envio.getRuta().size()) {
             envio.setEstado(Estado.Entregado);
 
         }
@@ -162,17 +164,17 @@ public class UjaPack implements ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
     @Override
-    public void actualizarEnviosExtraviados(LocalDateTime ahora){
+    public void actualizarEnviosExtraviados(LocalDateTime ahora) {
         /*Ahora mismo la dejamos publica para usarla en los Tests
          y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
-        if(ahora.getHour()==0 && ahora.getMinute()==0 && ahora.getSecond()==0){
+        if (ahora.getHour() == 0 && ahora.getMinute() == 0 && ahora.getSecond() == 0) {
             for (Envio envio : repoEnvios.listEnvios()) {
-                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual()!=0) {
-                    LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual()-1)).getFecha();
-                    long dias=ChronoUnit.DAYS.between(ultimoRegistro,ahora);
-                    if(dias>7){
+                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
+                    LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
+                    long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
+                    if (dias > 7) {
                         envio.setEstado(Estado.Extraviado);
-                       // repoEnviosExtraviados.insertar(envio);
+                        // repoEnviosExtraviados.insertar(envio);
                         repoEnvios.actualizar(envio);
 
                     }
@@ -183,16 +185,17 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Busca los envios extraviados en un intervalo de tiempo
+     *
      * @param desde Fecha desde donde se quiere buscar
      * @param hasta Fecha hasta donde se quiere buscar
      * @return Lista de envios extraviados dentro del intervalo de tiempo
      */
     @Override
-    public List<Envio> consultarEnviosExtraviados(LocalDateTime desde,LocalDateTime hasta){
+    public List<Envio> consultarEnviosExtraviados(LocalDateTime desde, LocalDateTime hasta) {
         List<Envio> extraviados = new ArrayList<>();
-        for (Envio envio: repoEnvios.listEnviosExtraviados()) {
-            LocalDateTime ultimoRegistro=repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual()-1).getFecha();
-            if(ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta) ){
+        for (Envio envio : repoEnvios.listEnviosExtraviados()) {
+            LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1).getFecha();
+            if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
                 extraviados.add(envio);
 
 
@@ -208,34 +211,35 @@ public class UjaPack implements ServicioUjaPack {
      * @return Lista de todos los envios extraviados
      */
     @Override
-    public List<Envio> consultarEnviosExtraviados(){
+    public List<Envio> consultarEnviosExtraviados() {
         return new ArrayList<>(repoEnvios.listEnviosExtraviados());
 
     }
 
     /**
      * Calcula el porcentaje de envios extraviados en el ultimo periodo de tiempo seleccionado
+     *
      * @param ultimo Opcion seleccionada por el usuario dia/mes/año
      * @return Porcentaje de envios extraviados
      */
     @Override
-    public double porcentajeEnviosExtraviados(String ultimo){
+    public double porcentajeEnviosExtraviados(String ultimo) {
         //El Switch es pensando en un desplegable de opciones limitadas
-        double porcentaje=0;
+        double porcentaje = 0;
         List<Envio> extraviados;
         LocalDateTime ahora = LocalDateTime.now();
-        switch (ultimo){
+        switch (ultimo) {
 
             case "dia":
-                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.DAYS),ahora).size()/repoEnvios.listEnvios().size())*100;
+                porcentaje = ((double) consultarEnviosExtraviados(ahora.minus(1, ChronoUnit.DAYS), ahora).size() / repoEnvios.listEnvios().size()) * 100;
                 break;
 
             case "mes":
-                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.MONTHS),ahora).size()/repoEnvios.listEnvios().size())*100;
+                porcentaje = ((double) consultarEnviosExtraviados(ahora.minus(1, ChronoUnit.MONTHS), ahora).size() / repoEnvios.listEnvios().size()) * 100;
                 break;
 
             case "anio":
-                porcentaje=((double) consultarEnviosExtraviados(ahora.minus(1,ChronoUnit.YEARS),ahora).size()/repoEnvios.listEnvios().size())*100;
+                porcentaje = ((double) consultarEnviosExtraviados(ahora.minus(1, ChronoUnit.YEARS), ahora).size() / repoEnvios.listEnvios().size()) * 100;
                 break;
 
         }
@@ -257,8 +261,9 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Activa la notificacion en un envio
+     *
      * @param idenvio ID del envio
-     * @param noti Punto donde se quiere tener una notificacion de su llegada/salida
+     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
      */
     @Override
     public void activarNotificacion(long idenvio, String noti) {
@@ -270,7 +275,7 @@ public class UjaPack implements ServicioUjaPack {
             }
         }
         if (existe) {
-            Envio envi=repoEnvios.buscar(idenvio);
+            Envio envi = repoEnvios.buscar(idenvio);
             envi.setNotificacion(noti);
             repoEnvios.actualizar(envi);
         } else {
@@ -281,6 +286,7 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Devuelve la situacion actual del envio
+     *
      * @param idenvio ID del envio
      * @return Cadena de texto con la informacion
      */
@@ -300,6 +306,7 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Devuelve toda la informacion sobre la ruta de un pedido(hasta el momento o ya finalizado)
+     *
      * @param idenvio ID del envio
      * @return Cadena de texto con la informacion
      */
@@ -326,12 +333,13 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Lee el Json de Puntos de Ruta
+     *
      * @param file el nombre del archivo
      */
     @Override
     @Transactional
     public void leerJson(String file) throws IOException {//primero en un mapa y luego de una vez en la base de datos mediante el repositorio
-    if(repoPuntosRuta.listPuntosRuta().isEmpty()) {
+        if (repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
             /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
              * Pero en realidad si tuvieramos pensamiento de meter mas centros lo suyo seria que los indices de las oficinas empezaran
@@ -402,9 +410,10 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Busqueda Recursiva de caminos hacia una solucion
-     * @param actual Punto de Ruta actual en la busqueda
-     * @param destino Punto de Ruta final que deseamos alcanzar
-     * @param camino Set de ID's de Puntos de Ruta, se asegura no repetir punto en el proceso de crear un camino
+     *
+     * @param actual     Punto de Ruta actual en la busqueda
+     * @param destino    Punto de Ruta final que deseamos alcanzar
+     * @param camino     Set de ID's de Puntos de Ruta, se asegura no repetir punto en el proceso de crear un camino
      * @param soluciones La lista que contiene los caminos desde actual hasta destino encontrados.
      */
     private void busquedaRec(PuntoRuta actual, PuntoRuta destino, List<List<PuntoRuta>> soluciones, LinkedHashSet<Integer> camino) {
@@ -424,8 +433,10 @@ public class UjaPack implements ServicioUjaPack {
         }
         camino.remove(actual.getId());
     }
+
     /**
      * Transforma un set de enteros en una lista de Puntos de Ruta
+     *
      * @param camino Set de ID's de Puntos de Ruta, se asegura no repetir punto en el proceso de crear un camino
      * @return La lista de Puntos de Ruta
      */
@@ -439,7 +450,8 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Calculo de la ruta Minima desde un punto de ruta a otro
-     * @param origen Punto de Ruta desde el cual inicia  la busqueda
+     *
+     * @param origen  Punto de Ruta desde el cual inicia  la busqueda
      * @param destino Punto de Ruta final que deseamos alcanzar
      * @return El camino minimo encontrado
      */
@@ -467,8 +479,10 @@ public class UjaPack implements ServicioUjaPack {
         return solucionMin;
 
     }
+
     /**
      * Dado un String busca este en los Puntos de Ruta y si existe devuelve el ID entero del punto
+     *
      * @param lugar Nombre del punto de ruta
      * @return ID del punto de ruta
      */
@@ -481,10 +495,12 @@ public class UjaPack implements ServicioUjaPack {
         }
         throw new DireccionesIncorrectas();
     }
+
     /**
      * Dado dos Strings, uno del punto de incio del envio
      * y otro del lugar al que se desea mandar devuelve la ruta minima de Puntos de Ruta
-     * @param remitente Nombre del punto de ruta de Inicio
+     *
+     * @param remitente    Nombre del punto de ruta de Inicio
      * @param destinatario Nombre del punto de ruta de Finalizacion
      * @return Lista de Puntos de Ruta, el camino minimo
      */

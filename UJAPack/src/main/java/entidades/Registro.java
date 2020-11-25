@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Entity
 //@Access(AccessType.FIELD)
 public class Registro {
-   // static final String STRING_EN = "E";
-   // static final String STRING_SA = "S";
+    // static final String STRING_EN = "E";
+    // static final String STRING_SA = "S";
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO) //Adrian creo que dijo que en sqlite no funcionaba bien el autoincrementar
+    @GeneratedValue(strategy = GenerationType.AUTO) //Adrian creo que dijo que en sqlite no funcionaba bien el autoincrementar
     int id_registro;
 
     /* Fecha de Registro */
@@ -49,13 +49,15 @@ public class Registro {
         return entrada ? STRING_EN : STRING_SA;
     } */
 
-    public Boolean getEntrada() { return entrada; }
+    public Boolean getEntrada() {
+        return entrada;
+    }
 
     public PuntoRuta getPuntoR() {
         return puntoR;
     }
 
-    public void actualizarRegistro(@NotNull LocalDateTime _fecha,@NotNull Boolean _entrada) {
+    public void actualizarRegistro(@NotNull LocalDateTime _fecha, @NotNull Boolean _entrada) {
         this.entrada = _entrada;
         this.fecha = _fecha;
 

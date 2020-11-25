@@ -10,8 +10,8 @@ public class UjaPackApplication {
 
     public static void main(String[] args) throws Exception {
 
-     //   SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
-     //   ApplicationContext context = servidor.run(args);
+        //   SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
+        //   ApplicationContext context = servidor.run(args);
         SpringApplication.run(UjaPackApplication.class, args);
 
     }

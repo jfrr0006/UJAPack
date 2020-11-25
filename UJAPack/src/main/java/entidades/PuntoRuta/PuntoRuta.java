@@ -20,7 +20,7 @@ public abstract class PuntoRuta {
     String nombre;
 
     /* Conexiones Puntos de Ruta*/
-    @ManyToMany(fetch=FetchType.EAGER)// cascade=CascadeType.ALL ? , mappedBy = "conexiones"
+    @ManyToMany(fetch = FetchType.EAGER)// cascade=CascadeType.ALL ? , mappedBy = "conexiones"
     @MapKey(name = "id")
     Map<Integer, PuntoRuta> conexiones;
 

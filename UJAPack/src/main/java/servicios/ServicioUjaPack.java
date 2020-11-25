@@ -18,12 +18,13 @@ public interface ServicioUjaPack {
 
     /**
      * Genera un nuevo envio
-     * @param remitente Nombre del lugar de Inicio del envio
-     * @param destinatario Nombre del lugar de Finalizacion del envio
-     * @param _datos_remitente Datos de la persona que realiza el envio
+     *
+     * @param remitente           Nombre del lugar de Inicio del envio
+     * @param destinatario        Nombre del lugar de Finalizacion del envio
+     * @param _datos_remitente    Datos de la persona que realiza el envio
      * @param _datos_destinatario Datos de la persona que recibe el envio
-     * @param peso Peso del paquete
-     * @param dimensiones Dimensiones del paquete
+     * @param peso                Peso del paquete
+     * @param dimensiones         Dimensiones del paquete
      * @return Nuevo envio creado
      */
     public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones, @NotBlank String _datos_remitente, @NotBlank String _datos_destinatario);
@@ -37,11 +38,12 @@ public interface ServicioUjaPack {
 
     /**
      * Busca los envios extraviados en un intervalo de tiempo
+     *
      * @param desde Fecha desde donde se quiere buscar
      * @param hasta Fecha hasta donde se quiere buscar
      * @return Lista de envios extraviados dentro del intervalo de tiempo
      */
-    public List<Envio> consultarEnviosExtraviados(LocalDateTime desde,LocalDateTime hasta);
+    public List<Envio> consultarEnviosExtraviados(LocalDateTime desde, LocalDateTime hasta);
 
     /**
      * @return Lista de todos los envios extraviados
@@ -50,6 +52,7 @@ public interface ServicioUjaPack {
 
     /**
      * Calcula el porcentaje de envios extraviados en el ultimo periodo de tiempo seleccionado
+     *
      * @param ultimo Opcion seleccionada por el usuario dia/mes/año
      * @return Porcentaje de envios extraviados
      */
@@ -57,13 +60,15 @@ public interface ServicioUjaPack {
 
     /**
      * Activa la notificacion en un envio
+     *
      * @param idenvio ID del envio
-     * @param noti Punto donde se quiere tener una notificacion de su llegada/salida
+     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
      */
     public void activarNotificacion(long idenvio, String noti);
 
     /**
      * Devuelve la situacion actual del envio
+     *
      * @param idenvio ID del envio
      * @return Cadena de texto con la informacion
      */
@@ -72,6 +77,7 @@ public interface ServicioUjaPack {
 
     /**
      * Devuelve toda la informacion sobre la ruta de un pedido(hasta el momento o ya finalizado)
+     *
      * @param idenvio ID del envio
      * @return Cadena de texto con la informacion
      */
@@ -80,7 +86,8 @@ public interface ServicioUjaPack {
     /**
      * Dado dos Strings, uno del punto de incio del envio
      * y otro del lugar al que se desea mandar devuelve la ruta minima de Puntos de Ruta
-     * @param remitente Nombre del punto de ruta de Inicio
+     *
+     * @param remitente    Nombre del punto de ruta de Inicio
      * @param destinatario Nombre del punto de ruta de Finalizacion
      * @return Lista de Puntos de Ruta, el camino minimo
      */
@@ -88,12 +95,14 @@ public interface ServicioUjaPack {
 
     /**
      * Lee el Json de Puntos de Ruta
+     *
      * @param file el nombre del archivo
      */
-    public void leerJson(String file)throws IOException;
+    public void leerJson(String file) throws IOException;
 
     /**
      * Devuelve un envio
+     *
      * @param id del envio
      */
     public Envio verEnvio(long id);

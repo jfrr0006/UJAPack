@@ -59,28 +59,30 @@ public class RepositorioEnvio {
         return envios;
 
     }
+
     /**
      * Añade un registro a la ruta de un envio
      */
-    public void añadirRegistro(Envio envio, Registro registro){
+    public void añadirRegistro(Envio envio, Registro registro) {
 
         Envio cuentaEnlazada = em.merge(envio);
 
         cuentaEnlazada.getRuta().add(registro);
 
     }
+
     /**
      * Devuelve la lista de registros de la ruta de un envio
+     *
      * @return listado Registros
      */
-    public List<Registro> listRuta(long envio){
+    public List<Registro> listRuta(long envio) {
 
-        Envio envi =em.find(Envio.class, envio);
+        Envio envi = em.find(Envio.class, envio);
 
-        return  new ArrayList<>(envi.getRuta());
+        return new ArrayList<>(envi.getRuta());
 
     }
-
 
 
 }

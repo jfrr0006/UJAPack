@@ -12,8 +12,8 @@ class PuntoRutaTest {
 
 
     @Test
-    void testValidacionOficina(){
-        PuntoRuta punto = new Oficina(12345,"NombreA","CentroA","OficinaA");
+    void testValidacionOficina() {
+        PuntoRuta punto = new Oficina(12345, "NombreA", "CentroA", "OficinaA");
 
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<PuntoRuta>> violations = validator.validate(punto);
@@ -22,10 +22,9 @@ class PuntoRutaTest {
     }
 
 
-
     @Test
-    void testValidacionCentroLog(){
-        PuntoRuta punto = new CentroLog(12345,"CentroA","OficinaA");
+    void testValidacionCentroLog() {
+        PuntoRuta punto = new CentroLog(12345, "CentroA", "OficinaA");
 
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<PuntoRuta>> violations = validator.validate(punto);
