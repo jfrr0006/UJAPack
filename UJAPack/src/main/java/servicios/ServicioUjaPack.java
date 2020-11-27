@@ -3,6 +3,7 @@ package servicios;
 import entidades.Envio;
 import entidades.PuntoRuta.PuntoRuta;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
@@ -92,13 +93,6 @@ public interface ServicioUjaPack {
      * @return Lista de Puntos de Ruta, el camino minimo
      */
     public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario);
-
-    /**
-     * Lee el Json de Puntos de Ruta
-     *
-     * @param file el nombre del archivo
-     */
-    public void leerJson(String file) throws IOException;
 
     /**
      * Devuelve un envio

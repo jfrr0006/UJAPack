@@ -39,11 +39,6 @@ class UjaPackTest {
     @Test
     void generarEnvioTest() {
 
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
      /*
      Entendemos que es mas limpio meterlos directamente inline en generar envio, pero vamos a dejar esto en comentario como leyenda
         String remitente = "Ceuta";
@@ -63,11 +58,7 @@ class UjaPackTest {
 
     @Test
     void notificacionPuntoControl() {
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.activarNotificacion(envio.getId(), "Barcelona");
@@ -78,6 +69,7 @@ class UjaPackTest {
         }
         envio = servicioUjaPack.verEnvio(envio.getId());
         Assertions.assertThat(envio.getEstado()).isEqualByComparingTo(Estado.Entregado);//Nos aseguramos que ha sido entregado
+        Assertions.assertThat(envio.getDatosNotificacion()).contains("El envio");
         Assertions.assertThat(envio.getRuta()).isNotEmpty();
         Assertions.assertThat(envio).isNotNull();
 
@@ -85,11 +77,6 @@ class UjaPackTest {
 
     @Test
     void obtenerSituacionEnvio() {
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
@@ -107,11 +94,7 @@ class UjaPackTest {
 
     @Test
     void generarEnvioExtraviado() {
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         for (int i = 0; i < 5; i++) {//Mitad del camino
@@ -130,11 +113,7 @@ class UjaPackTest {
 
     @Test
     void consultaEnviosExtraviados() {
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
         servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
@@ -158,11 +137,6 @@ class UjaPackTest {
 
     @Test
     void consultaPorcentajeEnviosExtraviados() {
-        try {
-            servicioUjaPack.leerJson("src\\main\\resources\\redujapack.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");

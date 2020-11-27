@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import servicios.ServicioUjaPack;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -31,9 +32,6 @@ public class UjaPack implements ServicioUjaPack {
 
     @Autowired
     private RepositorioEnvio repoEnvios;
-
-    //  @Autowired
-    //   private RepositorioEnvio repoEnviosExtraviados;
 
     @Autowired
     private RepositorioPuntoRuta repoPuntosRuta;
@@ -81,7 +79,7 @@ public class UjaPack implements ServicioUjaPack {
         }
         Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
         repoRegistro.insertar(aux3);
-        repoEnvios.añadirRegistro(nuevoEnvio, aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado //Transac
+        repoEnvios.añadirRegistro(nuevoEnvio, aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
 
         repoEnvios.actualizar(nuevoEnvio);
 
@@ -174,7 +172,6 @@ public class UjaPack implements ServicioUjaPack {
                     long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
                     if (dias > 7) {
                         envio.setEstado(Estado.Extraviado);
-                        // repoEnviosExtraviados.insertar(envio);
                         repoEnvios.actualizar(envio);
 
                     }
@@ -247,16 +244,23 @@ public class UjaPack implements ServicioUjaPack {
         return porcentaje;
     }
 
-    private String mandarNotificacion(Envio envio) {
-        //Antes sacabamos por pantalla pero hemos rectificado aunque aun no se usa el valor devuelto se espera usarse en un futuro
+    private void mandarNotificacion(Envio envio) {
+        //Antes sacabamos por pantalla pero hemos rectificado, ahora lo almacenamos con el objetivo de poder mostrarlo
         String es;
         if (envio.getRuta().get(envio.getRegistroActual()).getEntrada()) {
-            es = "ha entrado a ";
-        } else {
             es = "ha salido de ";
+        } else {
+            es = "ha entrado a ";
+        }
+        if(envio.getEstado()==Estado.EnReparto){
+            envio.setDatosNotificacion( "El envio con identificador " + envio.getId() + " esta en "+envio.getNotificacion());
+
+        }else{
+            envio.setDatosNotificacion( "El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion());
+
         }
 
-        return "El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion();
+        repoEnvios.actualizar(envio);
     }
 
     /**
@@ -334,11 +338,13 @@ public class UjaPack implements ServicioUjaPack {
     /**
      * Lee el Json de Puntos de Ruta
      *
-     * @param file el nombre del archivo
      */
-    @Override
-    @Transactional
-    public void leerJson(String file) throws IOException {//primero en un mapa y luego de una vez en la base de datos mediante el repositorio
+    @PostConstruct
+    //@Transactional
+    //  No funcionan ambas, se queda ignorado el transactional por lo que si queremos ahorrar codigo en los test seria asi,
+    //  ya que al poner el PostConstruct una vez se crea con el Autowired se llama a esta funcion, funciona si la funcion no tiene argumentos por eso el String File esta dentro
+    public void leerJson() throws IOException {
+        String file="src\\main\\resources\\redujapack.json";
         if (repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
             /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
@@ -378,7 +384,7 @@ public class UjaPack implements ServicioUjaPack {
                     oficinaNodo.setConexion(centroNodo);
                     centroNodo.setConexion(oficinaNodo);
                     repoPuntosRuta.insertar(oficinaNodo);
-                    // repoPuntosRuta.actualizar(centroNodo);
+                    repoPuntosRuta.actualizar(centroNodo);
 
                 }
 
@@ -399,8 +405,9 @@ public class UjaPack implements ServicioUjaPack {
 
             for (Integer centro : centrosLogisticosSet) {
                 for (Integer con : conexiones.get(centro)) {
-                    repoPuntosRuta.buscar(centro).setConexion(repoPuntosRuta.buscar(con));
-                    //   repoPuntosRuta.actualizar(aux);
+                    PuntoRuta aux= repoPuntosRuta.buscar(centro);
+                    aux.setConexion(repoPuntosRuta.buscar(con));
+                    repoPuntosRuta.actualizar(aux);
 
                 }
 

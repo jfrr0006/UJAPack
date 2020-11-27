@@ -60,6 +60,10 @@ public class Envio {
     @NotBlank
     String notificacion;
 
+    /* Punto de control donde se notificara */
+    @NotBlank
+    String datos_notificacion;
+
     /* Estado */
     Estado estado;
 
@@ -76,6 +80,7 @@ public class Envio {
         this.estado = Estado.EnTransito;
         this.registroActual = 0;
         this.notificacion = "Ninguna";
+        this.datos_notificacion="Nada";
 
     }
 
@@ -121,8 +126,14 @@ public class Envio {
     public void setNotificacion(@NotBlank String notificacion) {
         this.notificacion = notificacion;
     }
+    public void setDatosNotificacion(@NotBlank String d_notificacion) {
+        this.datos_notificacion = d_notificacion;
+    }
 
     public String getNotificacion() {
         return notificacion;
+    }
+    public String getDatosNotificacion() {
+        return datos_notificacion;
     }
 }
