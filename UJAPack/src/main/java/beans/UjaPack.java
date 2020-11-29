@@ -12,6 +12,7 @@ import entidades.PuntoRuta.PuntoRuta;
 import entidades.Registro;
 import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
+import excepciones.EnvioNoRegistrado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import servicios.ServicioUjaPack;
@@ -64,7 +65,6 @@ public class UjaPack implements ServicioUjaPack {
 
         long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
         Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
-        repoEnvios.insertar(nuevoEnvio);
 
         for (PuntoRuta punto : ruta) {
             Registro aux1 = new Registro(punto);
@@ -72,16 +72,17 @@ public class UjaPack implements ServicioUjaPack {
 
             repoRegistro.insertar(aux1);
             repoRegistro.insertar(aux2);
-            repoEnvios.añadirRegistro(nuevoEnvio, aux1);
-            repoEnvios.añadirRegistro(nuevoEnvio, aux2);
+            nuevoEnvio.getRuta().add(aux1);
+            nuevoEnvio.getRuta().add(aux2);
+
 
 
         }
         Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
         repoRegistro.insertar(aux3);
-        repoEnvios.añadirRegistro(nuevoEnvio, aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
+        nuevoEnvio.getRuta().add(aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
 
-        repoEnvios.actualizar(nuevoEnvio);
+        repoEnvios.insertar(nuevoEnvio);
 
         return nuevoEnvio;
     }
@@ -109,7 +110,7 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     @Transactional
     public Envio verEnvio(long id) {
-        Envio envio = repoEnvios.buscar(id);//meterle throw
+        Envio envio = repoEnvios.buscar(id).orElseThrow(EnvioNoRegistrado::new);
         envio.getRuta().size();
         return envio;
     }
@@ -220,7 +221,7 @@ public class UjaPack implements ServicioUjaPack {
      * @return Porcentaje de envios extraviados
      */
     @Override
-    public double porcentajeEnviosExtraviados(String ultimo) {
+    public double porcentajeEnviosExtraviados(@NotBlank String ultimo) {
         //El Switch es pensando en un desplegable de opciones limitadas
         double porcentaje = 0;
         List<Envio> extraviados;
@@ -270,8 +271,8 @@ public class UjaPack implements ServicioUjaPack {
      * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
      */
     @Override
-    public void activarNotificacion(long idenvio, String noti) {
-        Boolean existe = false;
+    public void activarNotificacion(long idenvio, @NotBlank String noti) {
+        boolean existe = false;
         for (Registro regis : repoEnvios.listRuta(idenvio)) {
             if (noti.equals(regis.getPuntoR().getLugar())) {
                 existe = true;
@@ -279,7 +280,7 @@ public class UjaPack implements ServicioUjaPack {
             }
         }
         if (existe) {
-            Envio envi = repoEnvios.buscar(idenvio);
+            Envio envi = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
             envi.setNotificacion(noti);
             repoEnvios.actualizar(envi);
         } else {
@@ -298,7 +299,7 @@ public class UjaPack implements ServicioUjaPack {
     public String situacionActualEnvio(long idenvio) {
         String es;
         List<Registro> ruta = repoEnvios.listRuta(idenvio);
-        int registroActual = repoEnvios.buscar(idenvio).getRegistroActual() - 1;
+        int registroActual = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new).getRegistroActual() - 1;
         if (ruta.get(registroActual).getEntrada()) {
             es = "Ha entrado a ";
         } else {
@@ -405,8 +406,8 @@ public class UjaPack implements ServicioUjaPack {
 
             for (Integer centro : centrosLogisticosSet) {
                 for (Integer con : conexiones.get(centro)) {
-                    PuntoRuta aux= repoPuntosRuta.buscar(centro);
-                    aux.setConexion(repoPuntosRuta.buscar(con));
+                    PuntoRuta aux= repoPuntosRuta.buscar(centro).orElseThrow(EnvioNoRegistrado::new);
+                    aux.setConexion(repoPuntosRuta.buscar(con).orElseThrow(EnvioNoRegistrado::new));
                     repoPuntosRuta.actualizar(aux);
 
                 }
@@ -450,7 +451,7 @@ public class UjaPack implements ServicioUjaPack {
     private List<PuntoRuta> convertirSetEnLista(LinkedHashSet<Integer> camino) {
         List<PuntoRuta> lista = new ArrayList<>();
         for (Integer id : camino) {
-            lista.add(repoPuntosRuta.buscar(id));
+            lista.add(repoPuntosRuta.buscar(id).orElseThrow(EnvioNoRegistrado::new));
         }
         return lista;
     }
@@ -513,7 +514,7 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     public List<PuntoRuta> listaRutaMinima(@NotBlank String remitente, @NotBlank String destinatario) {
-        return calcularRuta(repoPuntosRuta.buscar(convertirStringEnPuntoRuta(remitente)), repoPuntosRuta.buscar(convertirStringEnPuntoRuta(destinatario)));
+        return calcularRuta(repoPuntosRuta.buscar(convertirStringEnPuntoRuta(remitente)).orElseThrow(EnvioNoRegistrado::new), repoPuntosRuta.buscar(convertirStringEnPuntoRuta(destinatario)).orElseThrow(EnvioNoRegistrado::new));
 
     }
 }

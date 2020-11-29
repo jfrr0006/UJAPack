@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -75,7 +74,7 @@ class UjaPackTest {
                 "Pinocho2 Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.activarNotificacion(envio.getId(), "Barcelona");
 
-        for (int i = 0; i < envio.getRuta().size() + 20; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
+        for (int i = 0; i < 30; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
             servicioUjaPack.avanzarEnvios();
 
         }
@@ -168,7 +167,7 @@ class UjaPackTest {
                 "Gepeto7 Marin - Atlantida 66667 - Calle Falsa 123",
                 "Pinocho7 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
+        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2021-12-31T00:00:00"));
 
 
         Assertions.assertThat(envio3.getEstado()).isNotEqualByComparingTo(Estado.Extraviado);

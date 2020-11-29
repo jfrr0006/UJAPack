@@ -29,7 +29,7 @@ public class UjaPackApplication {
         return cmfb;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         //   SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
         //   ApplicationContext context = servidor.run(args);

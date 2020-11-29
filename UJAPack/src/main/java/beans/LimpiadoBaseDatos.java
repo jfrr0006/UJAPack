@@ -26,6 +26,7 @@ public class LimpiadoBaseDatos {
     final String[] entidades = {
             "Registro",
             "Envio"
+            //"hibernate_sequence"
     };
 
     final String deleteFrom = "delete from ";

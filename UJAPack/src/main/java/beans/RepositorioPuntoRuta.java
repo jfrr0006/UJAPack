@@ -3,22 +3,24 @@ package beans;
 import entidades.PuntoRuta.PuntoRuta;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public class RepositorioPuntoRuta {
 
     @PersistenceContext
     EntityManager em;
 
-    public PuntoRuta buscar(int clave) {
-        return em.find(PuntoRuta.class, clave);
-    }
+    @Cacheable(value = "puntosRuta", key = "#clave")
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Optional<PuntoRuta> buscar(int clave) { return Optional.ofNullable(em.find(PuntoRuta.class, clave)); }
 
     public void insertar(PuntoRuta punto) {
         em.persist(punto);
@@ -37,13 +39,12 @@ public class RepositorioPuntoRuta {
      *
      * @return listado de puntos de ruta
      */
-    @Cacheable(value = "puntosRuta")
     public List<PuntoRuta> listPuntosRuta() {
 
-        List<PuntoRuta> puntos = em.createQuery("Select p from PuntoRuta p ", PuntoRuta.class).getResultList();
-
-        return puntos;
+        return em.createQuery("Select p from PuntoRuta p ", PuntoRuta.class).getResultList();
 
     }
+
+
 
 }

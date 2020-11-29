@@ -2,25 +2,28 @@ package beans;
 
 import entidades.Envio;
 import entidades.Registro;
+import excepciones.EnvioNoRegistrado;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public class RepositorioEnvio {
 
     @PersistenceContext
     EntityManager em;
 
-    public Envio buscar(long clave) {
-        return em.find(Envio.class, clave);
-    }
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Optional<Envio> buscar(long clave) { return Optional.ofNullable(em.find(Envio.class, clave)); }
 
     public void insertar(Envio envio) {
         em.persist(envio);
@@ -41,9 +44,7 @@ public class RepositorioEnvio {
      */
     public List<Envio> listEnvios() {
 
-        List<Envio> envios = em.createQuery("Select e from Envio e ", Envio.class).getResultList();
-
-        return envios;
+        return em.createQuery("Select e from Envio e ", Envio.class).getResultList();
 
     }
 
@@ -54,33 +55,22 @@ public class RepositorioEnvio {
      */
     public List<Envio> listEnviosExtraviados() {
 
-        List<Envio> envios = em.createQuery("Select e from Envio e where e.estado = 3", Envio.class).getResultList();
-
-        return envios;
+        return em.createQuery("Select e from Envio e where e.estado = 3", Envio.class).getResultList();
 
     }
 
-    /**
-     * Añade un registro a la ruta de un envio
-     */
-    public void añadirRegistro(Envio envio, Registro registro) {
-
-        Envio cuentaEnlazada = em.merge(envio);
-
-        cuentaEnlazada.getRuta().add(registro);
-
-    }
 
     /**
      * Devuelve la lista de registros de la ruta de un envio
      *
      * @return listado Registros
      */
-    public List<Registro> listRuta(long envio) {
+    @Cacheable(value = "enviosRuta", key = "#clave")
+    public List<Registro> listRuta(long clave) {
 
-        Envio envi = em.find(Envio.class, envio);
+        Optional<Envio> envi = Optional.ofNullable(em.find(Envio.class, clave));
 
-        return new ArrayList<>(envi.getRuta());
+        return new ArrayList<>(envi.orElseThrow(EnvioNoRegistrado::new).getRuta());
 
     }
 
