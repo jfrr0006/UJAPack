@@ -1,6 +1,7 @@
 package beans;
 
 import entidades.PuntoRuta.PuntoRuta;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class RepositorioPuntoRuta {
      *
      * @return listado de puntos de ruta
      */
+    @Cacheable(value = "puntosRuta")
     public List<PuntoRuta> listPuntosRuta() {
 
         List<PuntoRuta> puntos = em.createQuery("Select p from PuntoRuta p ", PuntoRuta.class).getResultList();

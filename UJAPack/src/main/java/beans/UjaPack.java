@@ -384,9 +384,9 @@ public class UjaPack implements ServicioUjaPack {
                     oficinaNodo.setConexion(centroNodo);
                     centroNodo.setConexion(oficinaNodo);
                     repoPuntosRuta.insertar(oficinaNodo);
-                    repoPuntosRuta.actualizar(centroNodo);
 
                 }
+                repoPuntosRuta.actualizar(centroNodo);
 
                 JsonArray conexionesAux = centroJson.getAsJsonArray("conexiones");
                 ArrayList<Integer> conexTmp = new ArrayList<>();

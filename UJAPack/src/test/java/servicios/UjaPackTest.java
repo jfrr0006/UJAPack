@@ -48,7 +48,13 @@ class UjaPackTest {
         Float peso = 5.0f;
         Float dimensiones = 10.0f;
       */
-        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        Envio envio = servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto1 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho1 Marin - Ballena 66668 - Avenida Esofago 123");
 
         Assertions.assertThat(envio.getId()).isNotNull();
         Assertions.assertThat(envio.getImporte()).isNotNull();
@@ -60,7 +66,13 @@ class UjaPackTest {
     void notificacionPuntoControl() {
 
 
-        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        Envio envio = servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto2 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho2 Marin - Ballena 66668 - Avenida Esofago 123");
         servicioUjaPack.activarNotificacion(envio.getId(), "Barcelona");
 
         for (int i = 0; i < envio.getRuta().size() + 20; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
@@ -78,7 +90,13 @@ class UjaPackTest {
     @Test
     void obtenerSituacionEnvio() {
 
-        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        Envio envio = servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto3 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho3 Marin - Ballena 66668 - Avenida Esofago 123");
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
             servicioUjaPack.avanzarEnvios();
 
@@ -96,7 +114,13 @@ class UjaPackTest {
     void generarEnvioExtraviado() {
 
 
-        Envio envio = servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        Envio envio = servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto4 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho4 Marin - Ballena 66668 - Avenida Esofago 123");
         for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
 
@@ -115,15 +139,34 @@ class UjaPackTest {
     void consultaEnviosExtraviados() {
 
 
-        servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
-        servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto5 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho5 Marin - Ballena 66668 - Avenida Esofago 123");
+
+        servicioUjaPack.generarEnvio(
+                "Madrid",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto6 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho6 Marin - Ballena 66668 - Avenida Esofago 123");
 
         for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
 
         }
 
-        Envio envio3 = servicioUjaPack.generarEnvio("Barcelona", "Toledo", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        Envio envio3 = servicioUjaPack.generarEnvio(
+                "Barcelona",
+                "Toledo",
+                5.0f,
+                10.0f,
+                "Gepeto7 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho7 Marin - Ballena 66668 - Avenida Esofago 123");
 
         servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
 
@@ -138,8 +181,19 @@ class UjaPackTest {
     @Test
     void consultaPorcentajeEnviosExtraviados() {
 
-        servicioUjaPack.generarEnvio("Ceuta", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
-        servicioUjaPack.generarEnvio("Madrid", "Barcelona", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.generarEnvio(
+                "Ceuta",
+                "Barcelona",
+                5.0f,
+                10.0f,
+                "Gepeto8 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho8 Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.generarEnvio(
+                "Madrid",
+                "Barcelona",
+                5.0f, 10.0f,
+                "Gepeto9 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho9 Marin - Ballena 66668 - Avenida Esofago 123");
 
         for (int i = 0; i < 5; i++) {//Mitad del camino
             servicioUjaPack.avanzarEnvios();
@@ -147,7 +201,13 @@ class UjaPackTest {
         }
 
 
-        servicioUjaPack.generarEnvio("Barcelona", "Toledo", 5.0f, 10.0f, "Gepeto Marin - Atlantida 66667 - Calle Falsa 123", "Pinocho Marin - Ballena 66668 - Avenida Esofago 123");
+        servicioUjaPack.generarEnvio(
+                "Barcelona",
+                "Toledo",
+                5.0f,
+                10.0f,
+                "Gepeto10 Marin - Atlantida 66667 - Calle Falsa 123",
+                "Pinocho10 Marin - Ballena 66668 - Avenida Esofago 123");
 
         servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
         double enviosExtr = servicioUjaPack.porcentajeEnviosExtraviados("dia");
