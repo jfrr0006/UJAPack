@@ -23,7 +23,7 @@ public class Registro {
 
     /* Si el Registro es de Entrada o Salida */
     //@Transient
-    Boolean entrada;
+    boolean entrada;
 
     /* Registro del Punto de Ruta */
     @OneToOne
@@ -49,7 +49,7 @@ public class Registro {
         return entrada ? STRING_EN : STRING_SA;
     } */
 
-    public Boolean getEntrada() {
+    public boolean getEntrada() {
         return entrada;
     }
 
@@ -57,7 +57,7 @@ public class Registro {
         return puntoR;
     }
 
-    public void actualizarRegistro(@NotNull LocalDateTime _fecha, @NotNull Boolean _entrada) {
+    public void actualizarRegistro(@NotNull LocalDateTime _fecha, @NotNull boolean _entrada) {
         this.entrada = _entrada;
         this.fecha = _fecha;
 

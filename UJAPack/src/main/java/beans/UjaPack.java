@@ -123,7 +123,7 @@ public class UjaPack implements ServicioUjaPack {
      * @param envio Envio del cual se va a registrar una entrada o salida
      */
     private void registroES(Envio envio) {
-        Boolean entrada;
+        boolean entrada;
         if (envio.getRegistroActual() == 0) {
             entrada = true;
         } else {
