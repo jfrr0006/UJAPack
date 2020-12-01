@@ -26,7 +26,7 @@ public class Registro {
     boolean entrada;
 
     /* Registro del Punto de Ruta */
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "fk_puntoRuta")
     PuntoRuta puntoR;
 
