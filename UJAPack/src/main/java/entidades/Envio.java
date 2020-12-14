@@ -36,7 +36,7 @@ public class Envio {
     @Positive
     float peso;
 
-    /* Peso */
+    /* Dimensiones */
     @Positive
     float dimensiones;
 

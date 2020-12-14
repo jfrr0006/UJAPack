@@ -300,10 +300,14 @@ public class UjaPack implements ServicioUjaPack {
         String es;
         List<Registro> ruta = repoEnvios.listRuta(idenvio);
         int registroActual = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new).getRegistroActual() - 1;
-        if (ruta.get(registroActual).getEntrada()) {
-            es = "Ha entrado a ";
-        } else {
-            es = "Ha salido de ";
+        if(registroActual==-1){
+            return "El envio todavia no ha llegado al primer punto de control";
+        }else {
+            if (ruta.get(registroActual).getEntrada()) {
+                es = "Ha entrado a ";
+            } else {
+                es = "Ha salido de ";
+            }
         }
         return "Ubicacion: " + es + ruta.get(registroActual).getPuntoR().getLugar() + " Hora: " + ruta.get(registroActual).getFecha().toString();
 
@@ -345,7 +349,7 @@ public class UjaPack implements ServicioUjaPack {
     //  No funcionan ambas, se queda ignorado el transactional por lo que si queremos ahorrar codigo en los test seria asi,
     //  ya que al poner el PostConstruct una vez se crea con el Autowired se llama a esta funcion, funciona si la funcion no tiene argumentos por eso el String File esta dentro
     public void leerJson() throws IOException {
-        String file="src\\main\\resources\\redujapack.json";
+        String file=".\\src\\main\\resources\\redujapack.json";
         if (repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
             /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
