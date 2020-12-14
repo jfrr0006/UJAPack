@@ -128,7 +128,6 @@ class UjaPackTest {
         servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
         envio = servicioUjaPack.verEnvio(envio.getId());
         List<Envio> enviosExtra = servicioUjaPack.consultarEnviosExtraviados();
-
         Assertions.assertThat(envio.getEstado()).isEqualByComparingTo(Estado.Extraviado);
         Assertions.assertThat(enviosExtra).isNotEmpty();
 

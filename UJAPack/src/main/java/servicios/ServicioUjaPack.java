@@ -16,6 +16,12 @@ public interface ServicioUjaPack {
     void avanzarEnvios();
 
     /**
+     * Avanza un envio en concreto
+     * @param idenvio ID del envio
+     */
+    void avanzarEnvioID(long idenvio);
+
+    /**
      * Genera un nuevo envio
      *
      * @param remitente           Nombre del lugar de Inicio del envio
@@ -34,6 +40,7 @@ public interface ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
      void actualizarEnviosExtraviados(LocalDateTime ahora);
+     void actualizarEnviosExtraviados();
 
     /**
      * Busca los envios extraviados en un intervalo de tiempo

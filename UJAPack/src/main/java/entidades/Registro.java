@@ -63,6 +63,11 @@ public class Registro {
 
     }
 
+    public boolean isNull() {
+
+        return this.fecha == null;
+    }
+
     /*
     public void actualizarRegistroString(@NotNull LocalDateTime _fecha,@NotNull String _entrada) {
         this.entrada = _entrada.equals(STRING_EN);

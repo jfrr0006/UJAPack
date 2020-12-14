@@ -12,7 +12,6 @@ public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception{
-        //Ademas de todos los usuarios en la base de datos creamos dos administradores
         auth.inMemoryAuthentication()
                 .withUser("user").roles("USER","DEFAULT").password("{noop}password");
 

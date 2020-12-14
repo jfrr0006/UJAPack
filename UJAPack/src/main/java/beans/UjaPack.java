@@ -14,6 +14,7 @@ import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
 import excepciones.EnvioNoRegistrado;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import servicios.ServicioUjaPack;
 
@@ -76,7 +77,6 @@ public class UjaPack implements ServicioUjaPack {
             nuevoEnvio.getRuta().add(aux2);
 
 
-
         }
         Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
         repoRegistro.insertar(aux3);
@@ -105,6 +105,21 @@ public class UjaPack implements ServicioUjaPack {
             }
 
         }
+    }
+
+    /**
+     * Avanza un envio en concreto
+     */
+    @Override
+    @Transactional
+    public void avanzarEnvioID(long idenvio) {
+        Envio envio = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
+        if (envio.getEstado() != Estado.Entregado) {
+            registroES(envio);
+            actualizarEstadoEnvio(envio);
+        }
+
+
     }
 
     @Override
@@ -163,9 +178,9 @@ public class UjaPack implements ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
     @Override
-    public void actualizarEnviosExtraviados(LocalDateTime ahora) {
-        /*Ahora mismo la dejamos publica para usarla en los Tests
-         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
+    public void actualizarEnviosExtraviados(LocalDateTime ahora) { //Funcion Para test
+       /*Ahora mismo la dejamos publica para usarla en los Tests
+        y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
         if (ahora.getHour() == 0 && ahora.getMinute() == 0 && ahora.getSecond() == 0) {
             for (Envio envio : repoEnvios.listEnvios()) {
                 if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
@@ -179,6 +194,24 @@ public class UjaPack implements ServicioUjaPack {
                 }
             }
         }
+    }
+    @Override
+    @Scheduled(cron = "0 0 0 * * *") //Funcion para su uso real
+    public void actualizarEnviosExtraviados() {
+       /*Ahora mismo la dejamos publica para usarla en los Tests
+        y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
+        LocalDateTime ahora= LocalDateTime.now();
+            for (Envio envio : repoEnvios.listEnvios()) {
+                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
+                    LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
+                    long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
+                    if (dias > 7) {
+                        envio.setEstado(Estado.Extraviado);
+                        repoEnvios.actualizar(envio);
+
+                    }
+                }
+            }
     }
 
     /**
@@ -224,7 +257,6 @@ public class UjaPack implements ServicioUjaPack {
     public double porcentajeEnviosExtraviados(@NotBlank String ultimo) {
         //El Switch es pensando en un desplegable de opciones limitadas
         double porcentaje = 0;
-        List<Envio> extraviados;
         LocalDateTime ahora = LocalDateTime.now();
         switch (ultimo) {
 
@@ -253,11 +285,11 @@ public class UjaPack implements ServicioUjaPack {
         } else {
             es = "ha entrado a ";
         }
-        if(envio.getEstado()==Estado.EnReparto){
-            envio.setDatosNotificacion( "El envio con identificador " + envio.getId() + " esta en "+envio.getNotificacion());
+        if (envio.getEstado() == Estado.EnReparto) {
+            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " esta en " + envio.getNotificacion());
 
-        }else{
-            envio.setDatosNotificacion( "El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion());
+        } else {
+            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion());
 
         }
 
@@ -274,10 +306,11 @@ public class UjaPack implements ServicioUjaPack {
     public void activarNotificacion(long idenvio, @NotBlank String noti) {
         boolean existe = false;
         for (Registro regis : repoEnvios.listRuta(idenvio)) {
-            if (noti.equals(regis.getPuntoR().getLugar())) {
+            if (noti.equals(regis.getPuntoR().getLugar()) && regis.isNull()) {
                 existe = true;
                 break;
             }
+
         }
         if (existe) {
             Envio envi = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
@@ -299,10 +332,18 @@ public class UjaPack implements ServicioUjaPack {
     public String situacionActualEnvio(long idenvio) {
         String es;
         List<Registro> ruta = repoEnvios.listRuta(idenvio);
-        int registroActual = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new).getRegistroActual() - 1;
-        if(registroActual==-1){
+        Envio envi = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
+        int registroActual = envi.getRegistroActual() - 1;
+
+        if (envi.getEstado() == Estado.Entregado) {
+            return "El envio ha llegado a su destino. Hora de entrega: " + ruta.get(registroActual).getFecha().toString();
+        }
+        if (envi.getEstado() == Estado.EnReparto) {
+            return "El envio empezó su reparto. Hora de inicio: " + ruta.get(registroActual).getFecha().toString();
+        }
+        if (registroActual == -1) {
             return "El envio todavia no ha llegado al primer punto de control";
-        }else {
+        } else {
             if (ruta.get(registroActual).getEntrada()) {
                 es = "Ha entrado a ";
             } else {
@@ -324,16 +365,33 @@ public class UjaPack implements ServicioUjaPack {
         String es;
         List<String> registros = new ArrayList<>();
         int cont = 0;
+        int registroActual = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new).getRegistroActual() - 1;
         List<Registro> ruta = repoEnvios.listRuta(idenvio);
 
-        while (ruta.get(cont).getFecha() != null) {
+        if (registroActual == -1) {
+            registros.add("El envio todavia no ha llegado al primer punto de control");
+            return registros;
+        }
 
-            if (ruta.get(cont).getEntrada()) {
-                es = "Ha entrado a ";
+        while (cont != ruta.size() && ruta.get(cont).getFecha() != null) {
+
+            if (cont == ruta.size() - 1) {
+                registros.add("El envio ha llegado a su destino. Hora de entrega: " + ruta.get(cont).getFecha().toString());
+
             } else {
-                es = "Ha salido de ";
+
+                if (cont == ruta.size() - 2) {
+                    registros.add("El envio empezó su reparto. Hora de inicio: " + ruta.get(cont).getFecha().toString());
+
+                } else {
+                    if (ruta.get(cont).getEntrada()) {
+                        es = "Ha entrado a ";
+                    } else {
+                        es = "Ha salido de ";
+                    }
+                    registros.add("Ubicacion: " + es + ruta.get(cont).getPuntoR().getLugar() + " Hora: " + ruta.get(cont).getFecha().toString());
+                }
             }
-            registros.add("Ubicacion: " + es + ruta.get(cont).getPuntoR().getLugar() + " Hora: " + ruta.get(cont).getFecha().toString());
             cont++;
         }
 
@@ -342,14 +400,13 @@ public class UjaPack implements ServicioUjaPack {
 
     /**
      * Lee el Json de Puntos de Ruta
-     *
      */
     @PostConstruct
     //@Transactional
     //  No funcionan ambas, se queda ignorado el transactional por lo que si queremos ahorrar codigo en los test seria asi,
     //  ya que al poner el PostConstruct una vez se crea con el Autowired se llama a esta funcion, funciona si la funcion no tiene argumentos por eso el String File esta dentro
     public void leerJson() throws IOException {
-        String file=".\\src\\main\\resources\\redujapack.json";
+        String file = ".\\src\\main\\resources\\redujapack.json";
         if (repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
             /*Ponemos 11 para que en la estructura de datos, los centros esten desde la 0 al 10 y las oficinas empiecen en el 11
@@ -410,7 +467,7 @@ public class UjaPack implements ServicioUjaPack {
 
             for (Integer centro : centrosLogisticosSet) {
                 for (Integer con : conexiones.get(centro)) {
-                    PuntoRuta aux= repoPuntosRuta.buscar(centro).orElseThrow(EnvioNoRegistrado::new);
+                    PuntoRuta aux = repoPuntosRuta.buscar(centro).orElseThrow(EnvioNoRegistrado::new);
                     aux.setConexion(repoPuntosRuta.buscar(con).orElseThrow(EnvioNoRegistrado::new));
                     repoPuntosRuta.actualizar(aux);
 
@@ -522,3 +579,4 @@ public class UjaPack implements ServicioUjaPack {
 
     }
 }
+

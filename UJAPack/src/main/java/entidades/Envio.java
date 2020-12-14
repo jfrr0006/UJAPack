@@ -105,6 +105,32 @@ public class Envio {
         return estado;
     }
 
+    public float getPeso() {
+        return peso;
+    }
+
+    public float getDimensiones() {
+        return dimensiones;
+    }
+
+    public String getRemitente() {
+        return remitente;
+    }
+
+    public String getDestinatario() {
+        return destinatario;
+    }
+
+    public String getDatos_remitente() {
+        return datos_remitente;
+    }
+
+    public String getDatos_destinatario() {
+        return datos_destinatario;
+    }
+
+
+
     public int getRegistroActual() {
         return registroActual;
     }
