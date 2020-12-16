@@ -1,29 +1,28 @@
 package DTO;
 
 import Utils.Estado;
-import entidades.Envio;
+import org.springframework.hateoas.Link;
 
-import java.util.List;
+public class EnvioDTO {
 
-public class DTOEnvio {
-
-    public DTOEnvio(){
+    public EnvioDTO(){
 
     }
 
-    public DTOEnvio(Envio envi){
-        this.id = envi.getId();
-        this.importe = envi.getImporte();
-        this.peso = envi.getPeso();
-        this.dimensiones = envi.getDimensiones();
-        this.remitente = envi.getRemitente();
-        this.destinatario = envi.getDestinatario();
-        this.datos_remitente =envi.getDatos_remitente();
-        this.datos_destinatario=envi.getDatos_destinatario();
-        this.notificacion = envi.getNotificacion();
-        this.datos_notificacion = envi.getNotificacion();;
-        this.estado = envi.getEstado();
-        this.registroActual = envi.getRegistroActual();
+    public EnvioDTO(long _id, float _importe, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente,
+                    String _datos_destinatario, Estado _estado, int _registroactual, String _notificacion, String _datos_notificacion){
+        this.id = _id;
+        this.importe = _importe;
+        this.peso = _peso;
+        this.dimensiones =  _dimensiones;
+        this.remitente = _remitente;
+        this.destinatario = _destinatario;
+        this.datos_remitente = _datos_remitente;
+        this.datos_destinatario= _datos_destinatario;
+        this.estado = _estado;
+        this.registroActual = _registroactual;
+        this.notificacion = _notificacion;
+        this.datos_notificacion= _datos_notificacion;
     }
     /* Id del envio */
     private long id;
@@ -38,7 +37,7 @@ public class DTOEnvio {
     private float dimensiones;
 
     /* Lista de Registros de los Puntos */
-    private List<String> ruta;
+    private Link ruta;
 
     /* Registro Actual */
     private int registroActual;
@@ -101,51 +100,52 @@ public class DTOEnvio {
         this.id = id;
     }
 
-    public List<String> getRuta() {
-        return ruta;
+    public void setRuta(Link _ruta){
+        this.ruta=_ruta;
     }
 
-    public void setRuta(List<String> ruta) {
-        this.ruta = ruta;
-    }
 
     public int getRegistroActual() {
         return registroActual;
     }
 
-    public void setRegistroActual(int registroActual) {
-        this.registroActual = registroActual;
+    public  Link getRuta() {
+        return ruta;
+    }
+
+    public void setRegistroActual(int _registroActual) {
+        this.registroActual = _registroActual;
     }
 
     public String getNotificacion() {
         return notificacion;
     }
 
-    public void setNotificacion(String notificacion) {
-        this.notificacion = notificacion;
+    public void setNotificacion(String _notificacion) {
+        this.notificacion = _notificacion;
     }
 
     public String getDatos_notificacion() {
         return datos_notificacion;
     }
 
-    public void setDatos_notificacion(String datos_notificacion) {
-        this.datos_notificacion = datos_notificacion;
+    public void setDatos_notificacion(String _datos_notificacion) {
+        this.datos_notificacion = _datos_notificacion;
     }
 
     public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(Estado estado) {
-        this.estado = estado;
+    public void setEstado(Estado _estado) {
+        this.estado = _estado;
     }
 
     public float getImporte() {
         return importe;
     }
 
-    public void setImporte(float importe) {
-        this.importe = importe;
+    public void setImporte(float _importe) {
+        this.importe = _importe;
     }
 }

@@ -1,0 +1,7 @@
+GET /ujapack/envio/{id} -> Consultar un Envio (temporal para mejorar con seguridad poniendo por ejemplo su destino o su nombre)
+GET /ujapack/envio/{id}/ruta -> Obtener listado de los puntos de ruta que se han pasado hasta el momento
+GET /ujapack/envio/{id}/actual -> Devuelve la situacion actual del envio
+POST /ujapack/envio/nuevoenvio -> Crea un nuevo envio
+PUT /ujapack/envio/siguientepunto -> Avanza todos los envios (Probablemente lo quitamos porque esto era mas para testing, preguntar)
+PUT /ujapack/envio/{id}/siguientepunto -> Avanza un envio
+PUT /ujapack/envio/{id}/nuevanotificacion -> Modifica en que punto de ruta se quiere modificar(igual esto se deberia de cambiar y en vez de decir un lugar como esta puesto decir a mitad de camino, en localidad destino, porque el usuario no sabria la ruta que va a seguir)

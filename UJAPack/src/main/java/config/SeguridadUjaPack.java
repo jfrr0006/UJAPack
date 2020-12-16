@@ -5,7 +5,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import rest.RestEnvio;
+import beans.ServicioRestAPI;
 
 @Configuration
 public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
@@ -23,8 +23,7 @@ public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
         httpsec.csrf().disable();
         httpsec.httpBasic();
 
-        //Para RESTEnvio
-        String path = RestEnvio.URI_MAPPING;
+        String path = ServicioRestAPI.URI_MAPPING;
         httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path).permitAll();//
     }
 }

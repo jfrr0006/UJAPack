@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages = {"beans","rest","config"})
+@SpringBootApplication(scanBasePackages = {"beans","config"})
 @EntityScan(basePackages = "entidades")
 //@Configuration
 @EnableScheduling
