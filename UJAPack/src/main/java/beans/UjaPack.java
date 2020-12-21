@@ -13,6 +13,7 @@ import entidades.Registro;
 import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
 import excepciones.EnvioNoRegistrado;
+import excepciones.OpcionPorcentaje;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,7 @@ public class UjaPack implements ServicioUjaPack {
 
         long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
         Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
+        repoEnvios.insertar(nuevoEnvio);
 
         for (PuntoRuta punto : ruta) {
             Registro aux1 = new Registro(punto);
@@ -82,7 +84,7 @@ public class UjaPack implements ServicioUjaPack {
         repoRegistro.insertar(aux3);
         nuevoEnvio.getRuta().add(aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
 
-        repoEnvios.insertar(nuevoEnvio);
+        repoEnvios.actualizar(nuevoEnvio);
 
         return nuevoEnvio;
     }
@@ -195,7 +197,7 @@ public class UjaPack implements ServicioUjaPack {
             }
         }
     }
-    @Override
+  // @Override
     @Scheduled(cron = "0 0 0 * * *") //Funcion para su uso real
     public void actualizarEnviosExtraviados() {
        /*Ahora mismo la dejamos publica para usarla en los Tests
@@ -225,15 +227,15 @@ public class UjaPack implements ServicioUjaPack {
     public List<Envio> consultarEnviosExtraviados(LocalDateTime desde, LocalDateTime hasta) {
         List<Envio> extraviados = new ArrayList<>();
         for (Envio envio : repoEnvios.listEnviosExtraviados()) {
-            LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1).getFecha();
-            if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
-                extraviados.add(envio);
+            int registroActual = envio.getRegistroActual() - 1;
+                LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(registroActual).getFecha();
+                if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
+                    extraviados.add(envio);
 
 
-            }
+                }
 
         }
-
 
         return extraviados;
     }
@@ -258,7 +260,7 @@ public class UjaPack implements ServicioUjaPack {
         //El Switch es pensando en un desplegable de opciones limitadas
         double porcentaje = 0;
         LocalDateTime ahora = LocalDateTime.now();
-        switch (ultimo) {
+        switch (ultimo.toLowerCase()) {
 
             case "dia":
                 porcentaje = ((double) consultarEnviosExtraviados(ahora.minus(1, ChronoUnit.DAYS), ahora).size() / repoEnvios.listEnvios().size()) * 100;
@@ -272,6 +274,8 @@ public class UjaPack implements ServicioUjaPack {
                 porcentaje = ((double) consultarEnviosExtraviados(ahora.minus(1, ChronoUnit.YEARS), ahora).size() / repoEnvios.listEnvios().size()) * 100;
                 break;
 
+            default:
+                throw new OpcionPorcentaje();
         }
 
         return porcentaje;

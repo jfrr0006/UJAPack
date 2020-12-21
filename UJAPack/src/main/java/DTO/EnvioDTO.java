@@ -1,6 +1,7 @@
 package DTO;
 
 import Utils.Estado;
+import entidades.Envio;
 import org.springframework.hateoas.Link;
 
 public class EnvioDTO {
@@ -23,6 +24,20 @@ public class EnvioDTO {
         this.registroActual = _registroactual;
         this.notificacion = _notificacion;
         this.datos_notificacion= _datos_notificacion;
+    }
+    public EnvioDTO(Envio envi){
+        this.id = envi.getId();
+        this.importe = envi.getImporte();
+        this.peso = envi.getPeso();
+        this.dimensiones =  envi.getDimensiones();
+        this.remitente = envi.getRemitente();
+        this.destinatario = envi.getDestinatario();
+        this.datos_remitente = envi.getDatos_remitente();
+        this.datos_destinatario= envi.getDatos_destinatario();
+        this.estado = envi.getEstado();
+        this.registroActual = envi.getRegistroActual();
+        this.notificacion = envi.getNotificacion();
+        this.datos_notificacion= envi.getDatosNotificacion();
     }
     /* Id del envio */
     private long id;
@@ -57,7 +72,7 @@ public class EnvioDTO {
     /* Punto de control donde se notificara */
     private String notificacion;
 
-    /* Punto de control donde se notificara */
+    /* Notificacion */
     private String datos_notificacion;
 
     /* Estado */

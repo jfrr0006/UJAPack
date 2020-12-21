@@ -2,13 +2,14 @@ package beans;
 
 import entidades.Registro;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public class RepositorioRegistro {
 
     @PersistenceContext

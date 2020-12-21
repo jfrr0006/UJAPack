@@ -40,7 +40,6 @@ public interface ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
      void actualizarEnviosExtraviados(LocalDateTime ahora);
-     void actualizarEnviosExtraviados();
 
     /**
      * Busca los envios extraviados en un intervalo de tiempo

@@ -213,6 +213,7 @@ class UjaPackTest {
         Assertions.assertThat(enviosExtr).isCloseTo(66.66, within(0.1)); //Si no se borra la base de datos antes de este test, fallara porque esta hecho para que sean 2/3 extraviados
         Assertions.assertThat(enviosExtr).isPositive();
         Assertions.assertThat(enviosExtr).isLessThan(100);
+        Assertions.assertThat(servicioUjaPack.consultarEnviosExtraviados(LocalDateTime.parse("1900-12-31T00:00:00"), LocalDateTime.parse("1901-12-31T00:00:00")).size()).isEqualTo(0);
 
 
     }

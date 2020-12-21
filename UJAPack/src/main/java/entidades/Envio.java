@@ -60,7 +60,7 @@ public class Envio {
     @NotBlank
     String notificacion;
 
-    /* Punto de control donde se notificara */
+    /* Notificacion */
     @NotBlank
     String datos_notificacion;
 

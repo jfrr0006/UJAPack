@@ -8,7 +8,12 @@
 
     <cache name="enviosRuta"
            maxElementsInMemory="10000"
-           eternal="true"
+           eternal="false"
+           overflowToDisk="false" />
+
+    <cache name="envios"
+           maxElementsInMemory="10000"
+           eternal="false"
            overflowToDisk="false" />
 
 </ehcache>
