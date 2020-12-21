@@ -4,16 +4,16 @@
     <cache name="puntosRuta"
            maxElementsInMemory="10000"
            eternal="true"
-           overflowToDisk="false" />
+           overflowToDisk="false"/>
 
     <cache name="enviosRuta"
            maxElementsInMemory="10000"
            eternal="false"
-           overflowToDisk="false" />
+           overflowToDisk="false"/>
 
     <cache name="envios"
            maxElementsInMemory="10000"
            eternal="false"
-           overflowToDisk="false" />
+           overflowToDisk="false"/>
 
 </ehcache>

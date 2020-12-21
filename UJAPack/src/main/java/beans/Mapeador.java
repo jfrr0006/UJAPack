@@ -25,10 +25,10 @@ public class Mapeador {
                 envio.getDatosNotificacion());
 
 
-            envioDTO.setRuta(WebMvcLinkBuilder.
-                    linkTo(WebMvcLinkBuilder.methodOn(ServicioRestAPI.class).
-                            detalleRutaEnvio(envioDTO.getId())).
-                    withSelfRel());
+        envioDTO.setRuta(WebMvcLinkBuilder.
+                linkTo(WebMvcLinkBuilder.methodOn(ServicioRestAPI.class).
+                        detalleRutaEnvio(envioDTO.getId())).
+                withSelfRel());
 
 
         return envioDTO;

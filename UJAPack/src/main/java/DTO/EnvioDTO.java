@@ -6,88 +6,77 @@ import org.springframework.hateoas.Link;
 
 public class EnvioDTO {
 
-    public EnvioDTO(){
+    /* Id del envio */
+    private long id;
+    /* Importe */
+    private float importe;
+    /* Peso */
+    private float peso;
+    /* Dimensiones */
+    private float dimensiones;
+    /* Lista de Registros de los Puntos */
+    private Link ruta;
+    /* Registro Actual */
+    private int registroActual;
+    /* Remitente */
+    private String remitente;
+    /* Destinatario */
+    private String destinatario;
+    /* Datos Remitente */
+    private String datos_remitente;
+    /* Datos Destinatario */
+    private String datos_destinatario;
+    /* Punto de control donde se notificara */
+    private String notificacion;
+    /* Notificacion */
+    private String datos_notificacion;
+    /* Estado */
+    private Estado estado;
+
+    public EnvioDTO() {
 
     }
 
     public EnvioDTO(long _id, float _importe, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente,
-                    String _datos_destinatario, Estado _estado, int _registroactual, String _notificacion, String _datos_notificacion){
+                    String _datos_destinatario, Estado _estado, int _registroactual, String _notificacion, String _datos_notificacion) {
         this.id = _id;
         this.importe = _importe;
         this.peso = _peso;
-        this.dimensiones =  _dimensiones;
+        this.dimensiones = _dimensiones;
         this.remitente = _remitente;
         this.destinatario = _destinatario;
         this.datos_remitente = _datos_remitente;
-        this.datos_destinatario= _datos_destinatario;
+        this.datos_destinatario = _datos_destinatario;
         this.estado = _estado;
         this.registroActual = _registroactual;
         this.notificacion = _notificacion;
-        this.datos_notificacion= _datos_notificacion;
+        this.datos_notificacion = _datos_notificacion;
     }
 
-    public EnvioDTO( String _remitente, String _destinatario,float _peso, float _dimensiones, String _datos_remitente,
-                    String _datos_destinatario){
+    public EnvioDTO(String _remitente, String _destinatario, float _peso, float _dimensiones, String _datos_remitente,
+                    String _datos_destinatario) {
         this.peso = _peso;
-        this.dimensiones =  _dimensiones;
+        this.dimensiones = _dimensiones;
         this.remitente = _remitente;
         this.destinatario = _destinatario;
         this.datos_remitente = _datos_remitente;
-        this.datos_destinatario= _datos_destinatario;
+        this.datos_destinatario = _datos_destinatario;
     }
 
-    public EnvioDTO(Envio envi){
+    public EnvioDTO(Envio envi) {
         this.id = envi.getId();
         this.importe = envi.getImporte();
         this.peso = envi.getPeso();
-        this.dimensiones =  envi.getDimensiones();
+        this.dimensiones = envi.getDimensiones();
         this.remitente = envi.getRemitente();
         this.destinatario = envi.getDestinatario();
         this.datos_remitente = envi.getDatos_remitente();
-        this.datos_destinatario= envi.getDatos_destinatario();
+        this.datos_destinatario = envi.getDatos_destinatario();
         this.estado = envi.getEstado();
         this.registroActual = envi.getRegistroActual();
         this.notificacion = envi.getNotificacion();
-        this.datos_notificacion= envi.getDatosNotificacion();
+        this.datos_notificacion = envi.getDatosNotificacion();
     }
-    /* Id del envio */
-    private long id;
-
-    /* Importe */
-    private float importe;
-
-    /* Peso */
-    private float peso;
-
-    /* Dimensiones */
-    private float dimensiones;
-
-    /* Lista de Registros de los Puntos */
-    private Link ruta;
-
-    /* Registro Actual */
-    private int registroActual;
-
-    /* Remitente */
-    private  String remitente;
-
-    /* Destinatario */
-    private String destinatario;
-
-    /* Datos Remitente */
-    private String datos_remitente;
-
-    /* Datos Destinatario */
-    private String datos_destinatario;
-
-    /* Punto de control donde se notificara */
-    private String notificacion;
-
-    /* Notificacion */
-    private String datos_notificacion;
-
-    /* Estado */
-    private  Estado estado;
 
     public float getPeso() {
         return peso;
@@ -126,21 +115,20 @@ public class EnvioDTO {
         this.id = id;
     }
 
-    public void setRuta(Link _ruta){
-        this.ruta=_ruta;
-    }
-
-
     public int getRegistroActual() {
         return registroActual;
     }
 
-    public  Link getRuta() {
+    public void setRegistroActual(int _registroActual) {
+        this.registroActual = _registroActual;
+    }
+
+    public Link getRuta() {
         return ruta;
     }
 
-    public void setRegistroActual(int _registroActual) {
-        this.registroActual = _registroActual;
+    public void setRuta(Link _ruta) {
+        this.ruta = _ruta;
     }
 
     public String getNotificacion() {

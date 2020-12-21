@@ -80,7 +80,7 @@ public class Envio {
         this.estado = Estado.EnTransito;
         this.registroActual = 0;
         this.notificacion = "Ninguna";
-        this.datos_notificacion="Nada";
+        this.datos_notificacion = "Nada";
 
     }
 
@@ -103,6 +103,10 @@ public class Envio {
 
     public Estado getEstado() {
         return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
     }
 
     public float getPeso() {
@@ -129,8 +133,6 @@ public class Envio {
         return datos_destinatario;
     }
 
-
-
     public int getRegistroActual() {
         return registroActual;
     }
@@ -139,8 +141,8 @@ public class Envio {
         this.registroActual++;
     }
 
-    public void setEstado(Estado estado) {
-        this.estado = estado;
+    public String getNotificacion() {
+        return notificacion;
     }
 
     /**
@@ -152,14 +154,12 @@ public class Envio {
     public void setNotificacion(@NotBlank String notificacion) {
         this.notificacion = notificacion;
     }
-    public void setDatosNotificacion(@NotBlank String d_notificacion) {
-        this.datos_notificacion = d_notificacion;
-    }
 
-    public String getNotificacion() {
-        return notificacion;
-    }
     public String getDatosNotificacion() {
         return datos_notificacion;
+    }
+
+    public void setDatosNotificacion(@NotBlank String d_notificacion) {
+        this.datos_notificacion = d_notificacion;
     }
 }

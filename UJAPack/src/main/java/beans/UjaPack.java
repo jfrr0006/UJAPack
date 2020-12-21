@@ -118,9 +118,9 @@ public class UjaPack implements ServicioUjaPack {
     public void avanzarEnvioID(long idenvio) {
         Envio envio = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
         if (envio.getEstado() != Estado.Entregado) {
-                registroES(envio);
-                actualizarEstadoEnvio(envio);
-            }
+            registroES(envio);
+            actualizarEstadoEnvio(envio);
+        }
 
 
     }
@@ -198,23 +198,24 @@ public class UjaPack implements ServicioUjaPack {
             }
         }
     }
-  // @Override
+
+    // @Override
     @Scheduled(cron = "0 0 0 * * *") //Funcion para su uso real
     public void actualizarEnviosExtraviados() {
        /*Ahora mismo la dejamos publica para usarla en los Tests
         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
-        LocalDateTime ahora= LocalDateTime.now();
-            for (Envio envio : repoEnvios.listEnvios()) {
-                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
-                    LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
-                    long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
-                    if (dias > 7) {
-                        envio.setEstado(Estado.Extraviado);
-                        repoEnvios.actualizar(envio);
+        LocalDateTime ahora = LocalDateTime.now();
+        for (Envio envio : repoEnvios.listEnvios()) {
+            if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
+                LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
+                long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
+                if (dias > 7) {
+                    envio.setEstado(Estado.Extraviado);
+                    repoEnvios.actualizar(envio);
 
-                    }
                 }
             }
+        }
     }
 
     /**
@@ -229,12 +230,12 @@ public class UjaPack implements ServicioUjaPack {
         List<Envio> extraviados = new ArrayList<>();
         for (Envio envio : repoEnvios.listEnviosExtraviados()) {
             int registroActual = envio.getRegistroActual() - 1;
-                LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(registroActual).getFecha();
-                if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
-                    extraviados.add(envio);
+            LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(registroActual).getFecha();
+            if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
+                extraviados.add(envio);
 
 
-                }
+            }
 
         }
 

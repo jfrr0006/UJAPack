@@ -20,7 +20,9 @@ public class RepositorioPuntoRuta {
 
     @Cacheable(value = "puntosRuta", key = "#clave")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Optional<PuntoRuta> buscar(int clave) { return Optional.ofNullable(em.find(PuntoRuta.class, clave)); }
+    public Optional<PuntoRuta> buscar(int clave) {
+        return Optional.ofNullable(em.find(PuntoRuta.class, clave));
+    }
 
     public void insertar(PuntoRuta punto) {
         em.persist(punto);
@@ -44,7 +46,6 @@ public class RepositorioPuntoRuta {
         return em.createQuery("Select p from PuntoRuta p ", PuntoRuta.class).getResultList();
 
     }
-
 
 
 }

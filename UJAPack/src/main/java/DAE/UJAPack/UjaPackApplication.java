@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
-@SpringBootApplication(scanBasePackages = {"beans","config"})
+@SpringBootApplication(scanBasePackages = {"beans", "config"})
 @EntityScan(basePackages = "entidades")
 //@Configuration
 @EnableScheduling
@@ -29,14 +29,14 @@ public class UjaPackApplication {
         return cmfb;
     } */
 
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
-    }
-
     public static void main(String[] args) {
         SpringApplication.run(UjaPackApplication.class, args);
 
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
 }

@@ -24,13 +24,11 @@ import java.util.Set;
 @RestController
 @RequestMapping(ServicioRestAPI.URI_MAPPING)
 public class ServicioRestAPI {
-    public static final String URI_MAPPING ="/ujapack";
-
-    @Autowired
-    private UjaPack ujaPack;
-
+    public static final String URI_MAPPING = "/ujapack";
     @Autowired
     Mapeador mapper;
+    @Autowired
+    private UjaPack ujaPack;
 
     @ExceptionHandler(TransactionSystemException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -38,10 +36,10 @@ public class ServicioRestAPI {
         Throwable cause = e.getRootCause();
         if (cause instanceof ConstraintViolationException) {
             Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) cause).getConstraintViolations();
-            String message="";
-            for (Object o:
-            constraintViolations.toArray()) {
-                message+=o.toString()+"  ";
+            String message = "";
+            for (Object o :
+                    constraintViolations.toArray()) {
+                message += o.toString() + "  ";
 
             }
             return ResponseEntity.badRequest().body(message);
@@ -55,7 +53,7 @@ public class ServicioRestAPI {
     public void handlerEnvioNoRegistrado(EnvioNoRegistrado e) {
     }
 
-    @ExceptionHandler({DireccionesIncorrectas.class,DirNotificacionIncorrecta.class})
+    @ExceptionHandler({DireccionesIncorrectas.class, DirNotificacionIncorrecta.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerDireccionesIncorrectas(RuntimeException e) {
         return ResponseEntity.badRequest().body("Direccion incorrecta o no permitida");
@@ -69,39 +67,39 @@ public class ServicioRestAPI {
 
     @GetMapping("/")
     public ResponseEntity test() {
-        return new ResponseEntity<>("Funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧",HttpStatus.OK);
+        return new ResponseEntity<>("Funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", HttpStatus.OK);
     }
 
     @GetMapping(value = "/envios/{id}")
-    public ResponseEntity<EnvioDTO> consultaEnvio (@PathVariable("id") long id){
-        if (Long.toString(id).length() < 10 ) {//Numero menor de 10 cifras
+    public ResponseEntity<EnvioDTO> consultaEnvio(@PathVariable("id") long id) {
+        if (Long.toString(id).length() < 10) {//Numero menor de 10 cifras
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Envio envi= ujaPack.verEnvio(id);
+        Envio envi = ujaPack.verEnvio(id);
         return new ResponseEntity<>(mapper.aEnvioDTO(envi), HttpStatus.OK);
 
     }
 
     @GetMapping(value = "/envios/{id}/actual")
-    public ResponseEntity<RespuestaDTO> consultaEstadoEnvio (@PathVariable("id") long id){
-        String actu =ujaPack.situacionActualEnvio(id);
-        if(actu.equals("")){
+    public ResponseEntity<RespuestaDTO> consultaEstadoEnvio(@PathVariable("id") long id) {
+        String actu = ujaPack.situacionActualEnvio(id);
+        if (actu.equals("")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         }
-        return new ResponseEntity<>(new RespuestaDTO(actu),HttpStatus.OK);
+        return new ResponseEntity<>(new RespuestaDTO(actu), HttpStatus.OK);
 
     }
 
     @GetMapping(value = "/envios/{id}/ruta")
-    public ResponseEntity<List<String>> detalleRutaEnvio (@PathVariable("id") long id){
-        if (Long.toString(id).length() < 10 ) {
+    public ResponseEntity<List<String>> detalleRutaEnvio(@PathVariable("id") long id) {
+        if (Long.toString(id).length() < 10) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        List<String> lista =ujaPack.listadoRutaEnvio(id);
+        List<String> lista = ujaPack.listadoRutaEnvio(id);
 
-        if(lista == null){
+        if (lista == null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         }
@@ -110,27 +108,26 @@ public class ServicioRestAPI {
     }
 
     @GetMapping(value = "/envios/extraviados")
-    public ResponseEntity<List<EnvioDTO>> consultarExtraviados (@RequestParam(required=false) String desdeFecha,
-                                                              @RequestParam(required=false) String hastaFecha){
+    public ResponseEntity<List<EnvioDTO>> consultarExtraviados(@RequestParam(required = false) String desdeFecha,
+                                                               @RequestParam(required = false) String hastaFecha) {
         LocalDateTime fechaInicial;
         LocalDateTime fechaFinal;
 
         try {
             fechaInicial = desdeFecha != null ? LocalDateTime.parse(desdeFecha) : null;
             fechaFinal = hastaFecha != null ? LocalDateTime.parse(hastaFecha) : null;
-        }
-        catch(DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().build();
         }
         List<Envio> lista;
-        if(fechaInicial != null && fechaFinal != null){
-            lista = ujaPack.consultarEnviosExtraviados(fechaInicial,fechaFinal);
-        }else{
+        if (fechaInicial != null && fechaFinal != null) {
+            lista = ujaPack.consultarEnviosExtraviados(fechaInicial, fechaFinal);
+        } else {
             lista = ujaPack.consultarEnviosExtraviados();
         }
         List<EnvioDTO> listaDTO = new ArrayList<>();
 
-        for (Envio envi:
+        for (Envio envi :
                 lista) {
             listaDTO.add(mapper.aEnvioDTO(envi));
         }
@@ -139,9 +136,10 @@ public class ServicioRestAPI {
 
 
     }
+
     @GetMapping(value = "/envios/extraviados/porcentaje")
-    public ResponseEntity<Double> consultarExtraviados (@RequestParam() String ultimo){
-        double porcentaje= ujaPack.porcentajeEnviosExtraviados(ultimo);
+    public ResponseEntity<Double> consultarExtraviados(@RequestParam() String ultimo) {
+        double porcentaje = ujaPack.porcentajeEnviosExtraviados(ultimo);
 
         return new ResponseEntity<>(porcentaje, HttpStatus.OK);
 
@@ -149,41 +147,40 @@ public class ServicioRestAPI {
     }
 
     @PostMapping("/envios/nuevoenvio")
-    public  ResponseEntity<EnvioDTO> nuevoEnvio(@RequestBody EnvioDTO envio){
-        Envio envi= ujaPack.generarEnvio(envio.getRemitente(),envio.getDestinatario(),envio.getPeso(), envio.getDimensiones(),envio.getDatos_remitente() , envio.getDatos_destinatario());
+    public ResponseEntity<EnvioDTO> nuevoEnvio(@RequestBody EnvioDTO envio) {
+        Envio envi = ujaPack.generarEnvio(envio.getRemitente(), envio.getDestinatario(), envio.getPeso(), envio.getDimensiones(), envio.getDatos_remitente(), envio.getDatos_destinatario());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.aEnvioDTO(envi));
 
     }
 
     @PutMapping("/envios/siguientepunto")
-    public ResponseEntity avanzarEnvios(){
+    public ResponseEntity avanzarEnvios() {
         ujaPack.avanzarEnvios();
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
     @PutMapping("/envios/{id}/siguientepunto")
-    public  ResponseEntity<EnvioDTO> avanzarEnvioID(@PathVariable("id") long id){
+    public ResponseEntity<EnvioDTO> avanzarEnvioID(@PathVariable("id") long id) {
         ujaPack.avanzarEnvioID(id);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
 
     }
 
     @PutMapping("/envios/{id}/nuevanotificacion")
-    public  ResponseEntity<EnvioDTO> nuevaNotificacionEnvio(@PathVariable("id") long id,@RequestParam() String notifi){
-        ujaPack.activarNotificacion(id,notifi);
+    public ResponseEntity<EnvioDTO> nuevaNotificacionEnvio(@PathVariable("id") long id, @RequestParam() String notifi) {
+        ujaPack.activarNotificacion(id, notifi);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
 
     }
 
     @PutMapping("/envios/testextraviados") //Funcion para poder probar actualizar desde los test del rest
-    public  ResponseEntity<RespuestaDTO> actualizarEnviosExtraviados(@RequestParam String _fecha){
+    public ResponseEntity<RespuestaDTO> actualizarEnviosExtraviados(@RequestParam String _fecha) {
         LocalDateTime fecha;
 
         try {
             fecha = _fecha != null ? LocalDateTime.parse(_fecha) : null;
-        }
-        catch(DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             return ResponseEntity.badRequest().build();
         }
         ujaPack.actualizarEnviosExtraviados(fecha);

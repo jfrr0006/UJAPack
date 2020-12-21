@@ -13,12 +13,6 @@ import javax.persistence.PersistenceContext;
 
 @Service
 public class LimpiadoBaseDatos {
-    @PersistenceContext
-    EntityManager em;
-
-    @Autowired
-    TransactionTemplate transactionTemplate;
-
     /**
      * Lista de entidades a borrar. NO metemos PuntoRuta ya que no vamos a tocar los puntos de ruta en un principio
      * Por lo que se pueden insertar la primera vez y ya estan cargados para el resto de test
@@ -28,8 +22,11 @@ public class LimpiadoBaseDatos {
             "Envio"
             //"hibernate_sequence"
     };
-
     final String deleteFrom = "delete from ";
+    @PersistenceContext
+    EntityManager em;
+    @Autowired
+    TransactionTemplate transactionTemplate;
 
     /**
      * Realizar borrado
