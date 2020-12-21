@@ -22,6 +22,7 @@ import servicios.ServicioUjaPack;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -117,9 +118,9 @@ public class UjaPack implements ServicioUjaPack {
     public void avanzarEnvioID(long idenvio) {
         Envio envio = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
         if (envio.getEstado() != Estado.Entregado) {
-            registroES(envio);
-            actualizarEstadoEnvio(envio);
-        }
+                registroES(envio);
+                actualizarEstadoEnvio(envio);
+            }
 
 
     }
@@ -180,7 +181,7 @@ public class UjaPack implements ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
     @Override
-    public void actualizarEnviosExtraviados(LocalDateTime ahora) { //Funcion Para test
+    public void actualizarEnviosExtraviados(@NotNull LocalDateTime ahora) { //Funcion Para test
        /*Ahora mismo la dejamos publica para usarla en los Tests
         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
         if (ahora.getHour() == 0 && ahora.getMinute() == 0 && ahora.getSecond() == 0) {
@@ -340,10 +341,10 @@ public class UjaPack implements ServicioUjaPack {
         int registroActual = envi.getRegistroActual() - 1;
 
         if (envi.getEstado() == Estado.Entregado) {
-            return "El envio ha llegado a su destino. Hora de entrega: " + ruta.get(registroActual).getFecha().toString();
+            return "El envio ha llegado a su destino. Hora de entrega ->" + ruta.get(registroActual).getFecha().toString();
         }
         if (envi.getEstado() == Estado.EnReparto) {
-            return "El envio empezó su reparto. Hora de inicio: " + ruta.get(registroActual).getFecha().toString();
+            return "El envio empezó su reparto. Hora de inicio -> " + ruta.get(registroActual).getFecha().toString();
         }
         if (registroActual == -1) {
             return "El envio todavia no ha llegado al primer punto de control";
@@ -354,7 +355,7 @@ public class UjaPack implements ServicioUjaPack {
                 es = "Ha salido de ";
             }
         }
-        return "Ubicacion: " + es + ruta.get(registroActual).getPuntoR().getLugar() + " Hora: " + ruta.get(registroActual).getFecha().toString();
+        return "Ubicacion -> " + es + ruta.get(registroActual).getPuntoR().getLugar() + " Hora -> " + ruta.get(registroActual).getFecha().toString();
 
     }
 
@@ -380,12 +381,12 @@ public class UjaPack implements ServicioUjaPack {
         while (cont != ruta.size() && ruta.get(cont).getFecha() != null) {
 
             if (cont == ruta.size() - 1) {
-                registros.add("El envio ha llegado a su destino. Hora de entrega: " + ruta.get(cont).getFecha().toString());
+                registros.add("El envio ha llegado a su destino. Hora de entrega -> " + ruta.get(cont).getFecha().toString());
 
             } else {
 
                 if (cont == ruta.size() - 2) {
-                    registros.add("El envio empezó su reparto. Hora de inicio: " + ruta.get(cont).getFecha().toString());
+                    registros.add("El envio empezó su reparto. Hora de inicio -> " + ruta.get(cont).getFecha().toString());
 
                 } else {
                     if (ruta.get(cont).getEntrada()) {
@@ -393,7 +394,7 @@ public class UjaPack implements ServicioUjaPack {
                     } else {
                         es = "Ha salido de ";
                     }
-                    registros.add("Ubicacion: " + es + ruta.get(cont).getPuntoR().getLugar() + " Hora: " + ruta.get(cont).getFecha().toString());
+                    registros.add("Ubicacion -> " + es + ruta.get(cont).getPuntoR().getLugar() + " Hora -> " + ruta.get(cont).getFecha().toString());
                 }
             }
             cont++;

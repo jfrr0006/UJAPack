@@ -121,11 +121,12 @@ class UjaPackTest {
                 "Gepeto4 Marin - Atlantida 66667 - Calle Falsa 123",
                 "Pinocho4 Marin - Ballena 66668 - Avenida Esofago 123");
         for (int i = 0; i < 5; i++) {//Mitad del camino
-            servicioUjaPack.avanzarEnvios();
+            servicioUjaPack.avanzarEnvioID(envio.getId());
+
 
         }
 
-        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2020-12-31T00:00:00"));
+        servicioUjaPack.actualizarEnviosExtraviados(LocalDateTime.parse("2021-12-31T00:00:00"));
         envio = servicioUjaPack.verEnvio(envio.getId());
         List<Envio> enviosExtra = servicioUjaPack.consultarEnviosExtraviados();
         Assertions.assertThat(envio.getEstado()).isEqualByComparingTo(Estado.Extraviado);

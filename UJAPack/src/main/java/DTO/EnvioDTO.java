@@ -25,6 +25,17 @@ public class EnvioDTO {
         this.notificacion = _notificacion;
         this.datos_notificacion= _datos_notificacion;
     }
+
+    public EnvioDTO( String _remitente, String _destinatario,float _peso, float _dimensiones, String _datos_remitente,
+                    String _datos_destinatario){
+        this.peso = _peso;
+        this.dimensiones =  _dimensiones;
+        this.remitente = _remitente;
+        this.destinatario = _destinatario;
+        this.datos_remitente = _datos_remitente;
+        this.datos_destinatario= _datos_destinatario;
+    }
+
     public EnvioDTO(Envio envi){
         this.id = envi.getId();
         this.importe = envi.getImporte();

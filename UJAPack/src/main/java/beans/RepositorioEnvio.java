@@ -22,7 +22,7 @@ public class RepositorioEnvio {
     @PersistenceContext
     EntityManager em;
 
-    @Cacheable(value = "envios", key = "#clave")
+   // @Cacheable(value = "envios", key = "#clave") // Preguntar da problemas aunque no es eternal
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public Optional<Envio> buscar(long clave) { return Optional.ofNullable(em.find(Envio.class, clave)); }
 

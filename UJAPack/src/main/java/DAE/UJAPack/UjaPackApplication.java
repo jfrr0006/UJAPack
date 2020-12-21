@@ -28,15 +28,13 @@ public class UjaPackApplication {
         cmfb.setShared(true);
         return cmfb;
     } */
+
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();
     }
 
     public static void main(String[] args) {
-
-        //   SpringApplication servidor = new SpringApplication(UjaPackApplication.class);
-        //   ApplicationContext context = servidor.run(args);
         SpringApplication.run(UjaPackApplication.class, args);
 
     }

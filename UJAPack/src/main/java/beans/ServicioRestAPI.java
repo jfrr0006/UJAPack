@@ -1,6 +1,7 @@
 package beans;
 
 import DTO.EnvioDTO;
+import DTO.RespuestaDTO;
 import entidades.Envio;
 import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
@@ -56,7 +57,7 @@ public class ServicioRestAPI {
 
     @ExceptionHandler({DireccionesIncorrectas.class,DirNotificacionIncorrecta.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handlerDireccionesIncorrectas(DireccionesIncorrectas e) {
+    public ResponseEntity<String> handlerDireccionesIncorrectas(RuntimeException e) {
         return ResponseEntity.badRequest().body("Direccion incorrecta o no permitida");
     }
 
@@ -82,13 +83,13 @@ public class ServicioRestAPI {
     }
 
     @GetMapping(value = "/envios/{id}/actual")
-    public ResponseEntity<String> consultaEstadoEnvio (@PathVariable("id") long id){
+    public ResponseEntity<RespuestaDTO> consultaEstadoEnvio (@PathVariable("id") long id){
         String actu =ujaPack.situacionActualEnvio(id);
         if(actu.equals("")){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         }
-        return new ResponseEntity<>(actu,HttpStatus.OK);
+        return new ResponseEntity<>(new RespuestaDTO(actu),HttpStatus.OK);
 
     }
 
@@ -139,16 +140,16 @@ public class ServicioRestAPI {
 
     }
     @GetMapping(value = "/envios/extraviados/porcentaje")
-    public ResponseEntity<String> consultarExtraviados (@RequestParam() String ultimo){
+    public ResponseEntity<Double> consultarExtraviados (@RequestParam() String ultimo){
         double porcentaje= ujaPack.porcentajeEnviosExtraviados(ultimo);
 
-        return new ResponseEntity<>("El porcentaje de envios extraviados en el ultimo "+ultimo+" es de "+Double.toString(porcentaje), HttpStatus.OK);
+        return new ResponseEntity<>(porcentaje, HttpStatus.OK);
 
 
     }
 
     @PostMapping("/envios/nuevoenvio")
-    public ResponseEntity nuevoEnvio(@RequestBody EnvioDTO envio){
+    public  ResponseEntity<EnvioDTO> nuevoEnvio(@RequestBody EnvioDTO envio){
         Envio envi= ujaPack.generarEnvio(envio.getRemitente(),envio.getDestinatario(),envio.getPeso(), envio.getDimensiones(),envio.getDatos_remitente() , envio.getDatos_destinatario());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.aEnvioDTO(envi));
 
@@ -157,24 +158,37 @@ public class ServicioRestAPI {
     @PutMapping("/envios/siguientepunto")
     public ResponseEntity avanzarEnvios(){
         ujaPack.avanzarEnvios();
-        return ResponseEntity.status(HttpStatus.CREATED).body("Todos los envios se han avanzado correctamente");
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
     @PutMapping("/envios/{id}/siguientepunto")
-    public ResponseEntity avanzarEnvioID(@PathVariable("id") long id){
+    public  ResponseEntity<EnvioDTO> avanzarEnvioID(@PathVariable("id") long id){
         ujaPack.avanzarEnvioID(id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
 
     }
 
     @PutMapping("/envios/{id}/nuevanotificacion")
-    public ResponseEntity nuevaNotificacionEnvio(@PathVariable("id") long id,@RequestBody String notifi){
+    public  ResponseEntity<EnvioDTO> nuevaNotificacionEnvio(@PathVariable("id") long id,@RequestParam() String notifi){
         ujaPack.activarNotificacion(id,notifi);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
 
     }
 
+    @PutMapping("/envios/testextraviados") //Funcion para poder probar actualizar desde los test del rest
+    public  ResponseEntity<RespuestaDTO> actualizarEnviosExtraviados(@RequestParam String _fecha){
+        LocalDateTime fecha;
 
+        try {
+            fecha = _fecha != null ? LocalDateTime.parse(_fecha) : null;
+        }
+        catch(DateTimeParseException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        ujaPack.actualizarEnviosExtraviados(fecha);
+        return ResponseEntity.status(HttpStatus.OK).body(new RespuestaDTO("Actualizacion terminada"));
+
+    }
 
 }
