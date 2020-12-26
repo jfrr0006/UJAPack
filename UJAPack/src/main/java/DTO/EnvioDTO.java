@@ -1,10 +1,12 @@
 package DTO;
 
 import Utils.Estado;
-import entidades.Envio;
 import org.springframework.hateoas.Link;
 
 public class EnvioDTO {
+
+    /*Si quitamos informacion del DTO muchos del los TEST no se podrian hacer, hay datos como notificacion que son prescindibles de enseñar pero
+    necesitamos tenerlo en el GET para poder luego comprobarlo, en el Cliente Angular no lo mostraremos */
 
     /* Id del envio */
     private long id;
@@ -63,20 +65,6 @@ public class EnvioDTO {
         this.datos_destinatario = _datos_destinatario;
     }
 
-    public EnvioDTO(Envio envi) {
-        this.id = envi.getId();
-        this.importe = envi.getImporte();
-        this.peso = envi.getPeso();
-        this.dimensiones = envi.getDimensiones();
-        this.remitente = envi.getRemitente();
-        this.destinatario = envi.getDestinatario();
-        this.datos_remitente = envi.getDatos_remitente();
-        this.datos_destinatario = envi.getDatos_destinatario();
-        this.estado = envi.getEstado();
-        this.registroActual = envi.getRegistroActual();
-        this.notificacion = envi.getNotificacion();
-        this.datos_notificacion = envi.getDatosNotificacion();
-    }
 
     public float getPeso() {
         return peso;

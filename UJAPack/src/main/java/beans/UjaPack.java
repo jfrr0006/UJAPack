@@ -15,6 +15,7 @@ import excepciones.DireccionesIncorrectas;
 import excepciones.EnvioNoRegistrado;
 import excepciones.OpcionPorcentaje;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import servicios.ServicioUjaPack;
@@ -100,6 +101,7 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     @Transactional
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void avanzarEnvios() {
         for (Envio envio : repoEnvios.listEnvios()) {
             if (envio.getEstado() != Estado.Entregado) {
@@ -115,6 +117,7 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     @Transactional
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void avanzarEnvioID(long idenvio) {
         Envio envio = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
         if (envio.getEstado() != Estado.Entregado) {
@@ -181,6 +184,7 @@ public class UjaPack implements ServicioUjaPack {
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
     @Override
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void actualizarEnviosExtraviados(@NotNull LocalDateTime ahora) { //Funcion Para test
        /*Ahora mismo la dejamos publica para usarla en los Tests
         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
@@ -201,6 +205,7 @@ public class UjaPack implements ServicioUjaPack {
 
     // @Override
     @Scheduled(cron = "0 0 0 * * *") //Funcion para su uso real
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void actualizarEnviosExtraviados() {
        /*Ahora mismo la dejamos publica para usarla en los Tests
         y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
@@ -309,6 +314,7 @@ public class UjaPack implements ServicioUjaPack {
      * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
      */
     @Override
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void activarNotificacion(long idenvio, @NotBlank String noti) {
         boolean existe = false;
         for (Registro regis : repoEnvios.listRuta(idenvio)) {
@@ -356,6 +362,7 @@ public class UjaPack implements ServicioUjaPack {
                 es = "Ha salido de ";
             }
         }
+
         return "Ubicacion -> " + es + ruta.get(registroActual).getPuntoR().getLugar() + " Hora -> " + ruta.get(registroActual).getFecha().toString();
 
     }

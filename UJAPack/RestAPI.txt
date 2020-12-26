@@ -1,7 +1,10 @@
-GET /ujapack/envio/{id} -> Consultar un Envio (temporal para mejorar con seguridad poniendo por ejemplo su destino o su nombre)
-GET /ujapack/envio/{id}/ruta -> Obtener listado de los puntos de ruta que se han pasado hasta el momento
-GET /ujapack/envio/{id}/actual -> Devuelve la situacion actual del envio
-POST /ujapack/envio/nuevoenvio -> Crea un nuevo envio
-PUT /ujapack/envio/siguientepunto -> Avanza todos los envios (Probablemente lo quitamos porque esto era mas para testing, preguntar)
-PUT /ujapack/envio/{id}/siguientepunto -> Avanza un envio
-PUT /ujapack/envio/{id}/nuevanotificacion -> Modifica en que punto de ruta se quiere modificar(igual esto se deberia de cambiar y en vez de decir un lugar como esta puesto decir a mitad de camino, en localidad destino, porque el usuario no sabria la ruta que va a seguir)
+GET /ujapack/envios/public/{id} -> Consultar un Envio (temporal para mejorar con seguridad poniendo por ejemplo su destino o su nombre)
+GET /ujapack/envios/public/{id}/ruta -> Obtener listado de los puntos de ruta que se han pasado hasta el momento
+GET /ujapack/envios/public/{id}/actual -> Devuelve la situacion actual del envio
+GET /ujapack/envios/private/extraviados -> Si le pasas dos String (Desde,Hasta) te saca los envios extraviados entre esas fechas si no le pasasa nada te saca todos los extraviados
+GET /envios/private/extraviados/porcentaje -> Si le pasas un String(Dia, Mes o Anio) te calcula el porcentaje de envios extraviados en el ultimo margen de tiempo que le has pasado
+POST /ujapack/envios/private/nuevoenvio -> Crea un nuevo envio
+PUT /ujapack/envios/private/siguientepunto -> Avanza todos los envios (Probablemente lo quitamos porque esto era mas para testing, preguntar)
+PUT /ujapack/envios/private/{id}/siguientepunto -> Avanza un envio
+PUT /ujapack/envios/public/{id}/nuevanotificacion -> Modifica en que punto de ruta se quiere notificar(igual esto se deberia de cambiar y en vez de decir un lugar como esta puesto decir a mitad de camino, en localidad destino, porque el usuario no sabria la ruta que va a seguir)
+PUT /ujapack/envios/private/testextraviados -> Funcion para poder probar actualizar desde los test del rest los envios para hacerlos extraviados

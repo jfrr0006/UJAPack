@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@CrossOrigin(origins = "https://localhost:4200")
 @RestController
 @RequestMapping(ServicioRestAPI.URI_MAPPING)
 public class ServicioRestAPI {
@@ -70,7 +71,7 @@ public class ServicioRestAPI {
         return new ResponseEntity<>("Funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/envios/{id}")
+    @GetMapping(value = "/envios/public/{id}")
     public ResponseEntity<EnvioDTO> consultaEnvio(@PathVariable("id") long id) {
         if (Long.toString(id).length() < 10) {//Numero menor de 10 cifras
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -80,7 +81,7 @@ public class ServicioRestAPI {
 
     }
 
-    @GetMapping(value = "/envios/{id}/actual")
+    @GetMapping(value = "/envios/public/{id}/actual")
     public ResponseEntity<RespuestaDTO> consultaEstadoEnvio(@PathVariable("id") long id) {
         String actu = ujaPack.situacionActualEnvio(id);
         if (actu.equals("")) {
@@ -91,7 +92,7 @@ public class ServicioRestAPI {
 
     }
 
-    @GetMapping(value = "/envios/{id}/ruta")
+    @GetMapping(value = "/envios/public/{id}/ruta")
     public ResponseEntity<List<String>> detalleRutaEnvio(@PathVariable("id") long id) {
         if (Long.toString(id).length() < 10) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -107,7 +108,8 @@ public class ServicioRestAPI {
 
     }
 
-    @GetMapping(value = "/envios/extraviados")
+    @GetMapping(value = "/envios/private/extraviados")
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.GET)
     public ResponseEntity<List<EnvioDTO>> consultarExtraviados(@RequestParam(required = false) String desdeFecha,
                                                                @RequestParam(required = false) String hastaFecha) {
         LocalDateTime fechaInicial;
@@ -137,7 +139,7 @@ public class ServicioRestAPI {
 
     }
 
-    @GetMapping(value = "/envios/extraviados/porcentaje")
+    @GetMapping(value = "/envios/private/extraviados/porcentaje")
     public ResponseEntity<Double> consultarExtraviados(@RequestParam() String ultimo) {
         double porcentaje = ujaPack.porcentajeEnviosExtraviados(ultimo);
 
@@ -146,36 +148,39 @@ public class ServicioRestAPI {
 
     }
 
-    @PostMapping("/envios/nuevoenvio")
+    @PostMapping("/envios/private/nuevoenvio")
     public ResponseEntity<EnvioDTO> nuevoEnvio(@RequestBody EnvioDTO envio) {
         Envio envi = ujaPack.generarEnvio(envio.getRemitente(), envio.getDestinatario(), envio.getPeso(), envio.getDimensiones(), envio.getDatos_remitente(), envio.getDatos_destinatario());
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.aEnvioDTO(envi));
 
     }
 
-    @PutMapping("/envios/siguientepunto")
+    @PutMapping("/envios/private/siguientepunto")
     public ResponseEntity avanzarEnvios() {
         ujaPack.avanzarEnvios();
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
-    @PutMapping("/envios/{id}/siguientepunto")
-    public ResponseEntity<EnvioDTO> avanzarEnvioID(@PathVariable("id") long id) {
+    @PutMapping("/envios/private/{id}/siguientepunto")
+    public ResponseEntity avanzarEnvioID(@PathVariable("id") long id) {
+        if (Long.toString(id).length() < 10) {//Numero menor de 10 cifras
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         ujaPack.avanzarEnvioID(id);
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
-    @PutMapping("/envios/{id}/nuevanotificacion")
-    public ResponseEntity<EnvioDTO> nuevaNotificacionEnvio(@PathVariable("id") long id, @RequestParam() String notifi) {
+    @PutMapping("/envios/public/{id}/nuevanotificacion")
+    public ResponseEntity nuevaNotificacionEnvio(@PathVariable("id") long id, @RequestParam() String notifi) {
         ujaPack.activarNotificacion(id, notifi);
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.aEnvioDTO(ujaPack.verEnvio(id)));
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
-    @PutMapping("/envios/testextraviados") //Funcion para poder probar actualizar desde los test del rest
-    public ResponseEntity<RespuestaDTO> actualizarEnviosExtraviados(@RequestParam String _fecha) {
+    @PutMapping("/envios/private/testextraviados") //Funcion para poder probar actualizar desde los test del rest
+    public ResponseEntity actualizarEnviosExtraviados(@RequestParam String _fecha) {
         LocalDateTime fecha;
 
         try {
@@ -184,7 +189,7 @@ public class ServicioRestAPI {
             return ResponseEntity.badRequest().build();
         }
         ujaPack.actualizarEnviosExtraviados(fecha);
-        return ResponseEntity.status(HttpStatus.OK).body(new RespuestaDTO("Actualizacion terminada"));
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 

@@ -50,7 +50,7 @@ class ServicioRestTest {
 
         RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder()
                 .rootUri("http://localhost:" + localPort + "/ujapack")
-                .additionalMessageConverters(List.of(springBootJacksonConverter)).basicAuthentication("admin","admin");
+                .additionalMessageConverters(List.of(springBootJacksonConverter)).basicAuthentication("admin", "admin");
 
         restTemplate = new TestRestTemplate(restTemplateBuilder);
     }
@@ -75,7 +75,7 @@ class ServicioRestTest {
                 "PinochoREST1 Marin - Ballena 66668 - Avenida Esofago 123");
 
 
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
 
         Assertions.assertThat(respuestaPOST.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -93,17 +93,17 @@ class ServicioRestTest {
                 "GepetoREST2 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST2 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
 
 
-        ResponseEntity<EnvioDTO> respuestaPUT = restTemplate.exchange("/envios/{id}/nuevanotificacion?notifi=Barcelona", HttpMethod.PUT, null, EnvioDTO.class, respuestaPOST.getBody().getId());
+        ResponseEntity respuestaPUT = restTemplate.exchange("/envios/public/{id}/nuevanotificacion?notifi=Barcelona", HttpMethod.PUT, null, Void.class, respuestaPOST.getBody().getId());
 
         for (int i = 0; i < 30; i++) {//Nos aseguramos que va a avanzar el envio en su totalidad
-            restTemplate.exchange("/envios/{id}/siguientepunto", HttpMethod.PUT, null, Void.class, respuestaPOST.getBody().getId());
+            restTemplate.exchange("/envios/private/{id}/siguientepunto", HttpMethod.PUT, null, Void.class, respuestaPOST.getBody().getId());
 
         }
 
-        ResponseEntity<EnvioDTO> respuestaGET = restTemplate.getForEntity("/envios/{id}", EnvioDTO.class, respuestaPOST.getBody().getId());
+        ResponseEntity<EnvioDTO> respuestaGET = restTemplate.getForEntity("/envios/public/{id}", EnvioDTO.class, respuestaPOST.getBody().getId());
 
         Assertions.assertThat(respuestaGET.getBody().getEstado()).isEqualByComparingTo(Estado.Entregado);//Nos aseguramos que ha sido entregado
         Assertions.assertThat(respuestaGET.getBody().getDatos_notificacion()).contains("El envio");
@@ -125,15 +125,15 @@ class ServicioRestTest {
                 10.0f,
                 "GepetoREST3 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST3 Marin - Ballena 66668 - Avenida Esofago 123");
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
 
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
-            restTemplate.exchange("/envios/{id}/siguientepunto", HttpMethod.PUT, null, EnvioDTO.class, respuestaPOST.getBody().getId());
+            restTemplate.exchange("/envios/private/{id}/siguientepunto", HttpMethod.PUT, null, Void.class, respuestaPOST.getBody().getId());
 
         }
-        ResponseEntity<RespuestaDTO> respuestaGETactual = restTemplate.getForEntity("/envios/{id}/actual", RespuestaDTO.class, respuestaPOST.getBody().getId());
+        ResponseEntity<RespuestaDTO> respuestaGETactual = restTemplate.getForEntity("/envios/public/{id}/actual", RespuestaDTO.class, respuestaPOST.getBody().getId());
 
-        ResponseEntity<List> respuestaGETruta = restTemplate.getForEntity("/envios/{id}/ruta", List.class, respuestaPOST.getBody().getId());
+        ResponseEntity<List> respuestaGETruta = restTemplate.getForEntity("/envios/public/{id}/ruta", List.class, respuestaPOST.getBody().getId());
 
 
         Assertions.assertThat(respuestaGETactual.getBody().getMensaje()).isNotBlank();
@@ -155,16 +155,16 @@ class ServicioRestTest {
                 "GepetoREST4 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST4 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
 
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
-            restTemplate.exchange("/envios/{id}/siguientepunto", HttpMethod.PUT, null, EnvioDTO.class, respuestaPOST.getBody().getId());
+            restTemplate.exchange("/envios/private/{id}/siguientepunto", HttpMethod.PUT, null, Void.class, respuestaPOST.getBody().getId());
 
         }
 
-        ResponseEntity<RespuestaDTO> respuestaPUT = restTemplate.exchange("/envios/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, RespuestaDTO.class);
-        ResponseEntity<List> respuestaGET = restTemplate.getForEntity("/envios/extraviados", List.class);
-        ResponseEntity<EnvioDTO> respuestaGET2 = restTemplate.getForEntity("/envios/{id}", EnvioDTO.class, respuestaPOST.getBody().getId());
+        restTemplate.exchange("/envios/private/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, Void.class);
+        ResponseEntity<List> respuestaGET = restTemplate.getForEntity("/envios/private/extraviados", List.class);
+        ResponseEntity<EnvioDTO> respuestaGET2 = restTemplate.getForEntity("/envios/public/{id}", EnvioDTO.class, respuestaPOST.getBody().getId());
 
         Assertions.assertThat(respuestaGET.getBody()).isNotEmpty();
         Assertions.assertThat(respuestaPOST.getStatusCode()).isEqualByComparingTo(HttpStatus.CREATED);
@@ -195,11 +195,11 @@ class ServicioRestTest {
                 "GepetoREST6 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST6 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
-        ResponseEntity<EnvioDTO> respuestaPOST2 = restTemplate.postForEntity("/envios/nuevoenvio", envio2, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST2 = restTemplate.postForEntity("/envios/private/nuevoenvio", envio2, EnvioDTO.class);
 
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
-            restTemplate.exchange("/envios/siguientepunto", HttpMethod.PUT, null, EnvioDTO.class);
+            restTemplate.exchange("/envios/private/siguientepunto", HttpMethod.PUT, null, Void.class);
 
 
         }
@@ -212,13 +212,13 @@ class ServicioRestTest {
                 "GepetoREST7 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST7 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST3 = restTemplate.postForEntity("/envios/nuevoenvio", envio3, EnvioDTO.class);
-        ResponseEntity<RespuestaDTO> respuestaPUT = restTemplate.exchange("/envios/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, RespuestaDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST3 = restTemplate.postForEntity("/envios/private/nuevoenvio", envio3, EnvioDTO.class);
+        ResponseEntity respuestaPUT = restTemplate.exchange("/envios/private/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, Void.class);
         String aux = LocalDateTime.now().minus(1, ChronoUnit.DAYS).toString();
         String aux2 = LocalDateTime.now().toString();
-        ResponseEntity<List> respuestaGET1 = restTemplate.getForEntity("/envios/extraviados?desdeFecha=" + aux + "&hastaFecha=" + aux2, List.class);
-        ResponseEntity<List> respuestaGET2 = restTemplate.getForEntity("/envios/extraviados?desdeFecha=1900-12-31T00:00:00&hastaFecha=1901-12-31T00:00:00", List.class);
-        ResponseEntity<List> respuestaGET3 = restTemplate.getForEntity("/envios/extraviados", List.class);
+        ResponseEntity<List> respuestaGET1 = restTemplate.getForEntity("/envios/private/extraviados?desdeFecha=" + aux + "&hastaFecha=" + aux2, List.class);
+        ResponseEntity<List> respuestaGET2 = restTemplate.getForEntity("/envios/private/extraviados?desdeFecha=1900-12-31T00:00:00&hastaFecha=1901-12-31T00:00:00", List.class);
+        ResponseEntity<List> respuestaGET3 = restTemplate.getForEntity("/envios/private/extraviados", List.class);
 
 
         Assertions.assertThat(respuestaGET1.getBody().size()).isEqualTo(2);
@@ -254,11 +254,11 @@ class ServicioRestTest {
                 "GepetoREST9 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST9 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/nuevoenvio", envio, EnvioDTO.class);
-        ResponseEntity<EnvioDTO> respuestaPOST2 = restTemplate.postForEntity("/envios/nuevoenvio", envio2, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST = restTemplate.postForEntity("/envios/private/nuevoenvio", envio, EnvioDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST2 = restTemplate.postForEntity("/envios/private/nuevoenvio", envio2, EnvioDTO.class);
 
         for (int i = 0; i < 5; i++) {//Para que nos quedemos por la mitad del trayecto y ver la situacion en ese momento
-            restTemplate.exchange("/envios/siguientepunto", HttpMethod.PUT, null, EnvioDTO.class);
+            restTemplate.exchange("/envios/private/siguientepunto", HttpMethod.PUT, null, Void.class);
 
 
         }
@@ -271,10 +271,10 @@ class ServicioRestTest {
                 "GepetoREST10 Marin - Atlantida 66667 - Calle Falsa 123",
                 "PinochoREST10 Marin - Ballena 66668 - Avenida Esofago 123");
 
-        ResponseEntity<EnvioDTO> respuestaPOST3 = restTemplate.postForEntity("/envios/nuevoenvio", envio3, EnvioDTO.class);
-        ResponseEntity<RespuestaDTO> respuestaPUT = restTemplate.exchange("/envios/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, RespuestaDTO.class);
+        ResponseEntity<EnvioDTO> respuestaPOST3 = restTemplate.postForEntity("/envios/private/nuevoenvio", envio3, EnvioDTO.class);
+        ResponseEntity respuestaPUT = restTemplate.exchange("/envios/private/testextraviados?_fecha=2021-12-31T00:00:00", HttpMethod.PUT, null, Void.class);
 
-        ResponseEntity<Double> respuestaGET1 = restTemplate.getForEntity("/envios/extraviados/porcentaje?ultimo=dia", Double.class);
+        ResponseEntity<Double> respuestaGET1 = restTemplate.getForEntity("/envios/private/extraviados/porcentaje?ultimo=dia", Double.class);
 
         Assertions.assertThat(respuestaGET1.getBody()).isCloseTo(66.66, within(0.1)); //Si no se borra la base de datos antes de este test, fallara porque esta hecho para que sean 2/3 extraviados
         Assertions.assertThat(respuestaGET1.getBody()).isPositive();

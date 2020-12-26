@@ -7,13 +7,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
 public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
-
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,19 +29,16 @@ public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpsec) throws Exception {
         httpsec.csrf().disable();
-        httpsec.httpBasic();
+        httpsec.cors().and().httpBasic();
+
 
         String path = ServicioRestAPI.URI_MAPPING;
 
-        httpsec.authorizeRequests().antMatchers(path+"/**").hasRole("ADMIN");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.GET, path+"/envios/{id}").access("hasRole('USER') and #id !='extraviados' ");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.GET, path+"/envios/{id}/*").access("hasRole('USER') and #id !='extraviados' ");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path+"/envios/{id}/{noti}").access("hasRole('USER') and #noti =='nuevanotificacion' ");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path+"/envios/**").hasRole("OPERATOR");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.GET, path+"/envios/**").hasRole("OPERATOR");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path+"/envios/*").hasRole("TRANSPORT");
-
-
+        httpsec.authorizeRequests().antMatchers(path + "/envios/public/**").permitAll();
+        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/public/**").permitAll();
+        httpsec.authorizeRequests().antMatchers(path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
+        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/private/**").hasAnyRole("ADMIN", "TRANSPORT");//NO coge los derechos del transport
+        httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
 
 
     }

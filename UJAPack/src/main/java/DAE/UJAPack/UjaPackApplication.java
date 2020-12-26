@@ -11,23 +11,9 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(scanBasePackages = {"beans", "config"})
 @EntityScan(basePackages = "entidades")
-//@Configuration
 @EnableScheduling
 @EnableCaching
 public class UjaPackApplication {
-
-    /* Preguntar
-    @Bean
-    public CacheManager cacheManager() {
-        return new EhCacheCacheManager(ehCacheCacheManager().getObject());
-    }
-    @Bean
-    public EhCacheManagerFactoryBean ehCacheCacheManager() {
-        EhCacheManagerFactoryBean cmfb = new EhCacheManagerFactoryBean();
-        cmfb.setConfigLocation(new ClassPathResource("ehcache.xml"));
-        cmfb.setShared(true);
-        return cmfb;
-    } */
 
     public static void main(String[] args) {
         SpringApplication.run(UjaPackApplication.class, args);

@@ -3,6 +3,7 @@ package beans;
 import entidades.Envio;
 import entidades.Registro;
 import excepciones.EnvioNoRegistrado;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,7 +23,7 @@ public class RepositorioEnvio {
     @PersistenceContext
     EntityManager em;
 
-    // @Cacheable(value = "envios", key = "#clave") // Preguntar da problemas aunque no es eternal
+    @Cacheable(value = "envios", key = "#clave")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public Optional<Envio> buscar(long clave) {
         return Optional.ofNullable(em.find(Envio.class, clave));
@@ -32,10 +33,12 @@ public class RepositorioEnvio {
         em.persist(envio);
     }
 
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void actualizar(Envio envio) {
         em.merge(envio);
     }
 
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void eliminar(Envio envio) {
         em.remove(em.merge(envio));
     }

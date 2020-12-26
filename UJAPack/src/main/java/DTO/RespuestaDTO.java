@@ -1,21 +1,16 @@
 package DTO;
 
 public class RespuestaDTO {
+    //Su proposito es solo Auxiliar para que el RestTemplate de los Test no tenga problema al hacer la conversion a JSON
 
 
     /* Mensaje */
     private String mensaje;
-    /* Valores */
-    private Double valor;
 
     public RespuestaDTO(String _mensaje) {
         this.mensaje = _mensaje;
     }
 
-
-    public RespuestaDTO(Double _valor) {
-        this.valor = _valor;
-    }
 
     public RespuestaDTO() {
     }
