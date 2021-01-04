@@ -56,16 +56,21 @@ public class Envio {
     @NotBlank
     String datos_destinatario;
 
-    /* Punto de control donde se notificara */
-    @NotBlank
-    String notificacion;
-
-    /* Notificacion */
-    @NotBlank
-    String datos_notificacion;
-
     /* Estado */
     Estado estado;
+
+    /* Se ha quitado la parte de notificaciones */
+
+    /* Punto de control donde se notificara */
+    //@NotBlank
+    //String notificacion;
+
+    /* Notificacion */
+    //@NotBlank
+    //String datos_notificacion;
+
+
+
 
     public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente, String _datos_destinatario) {
         this.id = _id;
@@ -79,8 +84,8 @@ public class Envio {
         this.datos_destinatario = _datos_destinatario;
         this.estado = Estado.EnTransito;
         this.registroActual = 0;
-        this.notificacion = "Ninguna";
-        this.datos_notificacion = "Nada";
+        //this.notificacion = "Ninguna";
+        //this.datos_notificacion = "Nada";
 
     }
 
@@ -141,9 +146,7 @@ public class Envio {
         this.registroActual++;
     }
 
-    public String getNotificacion() {
-        return notificacion;
-    }
+
 
     /**
      * Modifica el lugar para notificar cuando llegue/salga de este
@@ -151,7 +154,10 @@ public class Envio {
      * @param notificacion el nombre del Punto de Ruta, EJ: Ceuta
      */
 
-    public void setNotificacion(@NotBlank String notificacion) {
+   /* public String getNotificacion() {
+       return notificacion;
+   }
+    public void setNotificacion(String notificacion) {
         this.notificacion = notificacion;
     }
 
@@ -159,7 +165,9 @@ public class Envio {
         return datos_notificacion;
     }
 
-    public void setDatosNotificacion(@NotBlank String d_notificacion) {
+    public void setDatosNotificacion(String d_notificacion) {
         this.datos_notificacion = d_notificacion;
     }
+
+    */
 }

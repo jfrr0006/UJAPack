@@ -10,7 +10,6 @@ import entidades.PuntoRuta.CentroLog;
 import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
 import entidades.Registro;
-import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
 import excepciones.EnvioNoRegistrado;
 import excepciones.OpcionPorcentaje;
@@ -23,7 +22,6 @@ import servicios.ServicioUjaPack;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -46,8 +44,6 @@ public class UjaPack implements ServicioUjaPack {
 
 
     public UjaPack() {
-
-
     }
 
     /**
@@ -66,8 +62,11 @@ public class UjaPack implements ServicioUjaPack {
 
         List<PuntoRuta> ruta = listaRutaMinima(remitente, destinatario);
         List<Registro> registros = new ArrayList<>();
+        long number;
 
-        long number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
+        do {
+            number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
+        }while (repoEnvios.buscar(number).isPresent());
         Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
         repoEnvios.insertar(nuevoEnvio);
 
@@ -129,7 +128,6 @@ public class UjaPack implements ServicioUjaPack {
     }
 
     @Override
-    @Transactional
     public Envio verEnvio(long id) {
         Envio envio = repoEnvios.buscar(id).orElseThrow(EnvioNoRegistrado::new);
         envio.getRuta().size();
@@ -153,10 +151,11 @@ public class UjaPack implements ServicioUjaPack {
 
         envio.getRuta().get(envio.getRegistroActual()).actualizarRegistro(LocalDateTime.now(), entrada);
 
-        if (envio.getNotificacion().equals(envio.getRuta().get(envio.getRegistroActual()).getPuntoR().getLugar())) {
+        /* if (envio.getNotificacion().equals(envio.getRuta().get(envio.getRegistroActual()).getPuntoR().getLugar())) {
             //Ha llegado al punto de notificacion
             mandarNotificacion(envio);
         }
+         */
         envio.avanzarRegistroActual();
 
     }
@@ -168,7 +167,6 @@ public class UjaPack implements ServicioUjaPack {
      */
 
     private void actualizarEstadoEnvio(Envio envio) {
-        //Actualizar Estado
         if (envio.getRegistroActual() == envio.getRuta().size() - 1) {
             envio.setEstado(Estado.EnReparto);
 
@@ -180,17 +178,19 @@ public class UjaPack implements ServicioUjaPack {
     }
 
     /**
-     * Funcion funciona solo a las 00:00:00, inspecciona a los pedidos en transito
+     * La funcion que se ejecuta solo a las 00:00:00 no es publica esta es usada para los test, inspecciona a los pedidos en transito
      * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
      */
     @Override
     @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
-    public void actualizarEnviosExtraviados(@NotNull LocalDateTime ahora) { //Funcion Para test
-       /*Ahora mismo la dejamos publica para usarla en los Tests
-        y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
+    public void actualizarEnviosExtraviadosTest() { //Funcion Para test
+        LocalDateTime ahora = LocalDateTime.parse("2200-12-31T00:00:00");
+        boolean extravi= true;
+        Random rand = new Random();
         if (ahora.getHour() == 0 && ahora.getMinute() == 0 && ahora.getSecond() == 0) {
-            for (Envio envio : repoEnvios.listEnvios()) {
-                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
+            for (Envio envio : repoEnvios.listEnvios()) {//Pone uno como extraviado como minimo y apartir de ese es aleatorio
+                if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0 && extravi) {
+                    extravi=rand.nextBoolean();
                     LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
                     long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
                     if (dias > 7) {
@@ -203,12 +203,14 @@ public class UjaPack implements ServicioUjaPack {
         }
     }
 
-    // @Override
+    /**
+     * Funcion funciona solo a las 00:00:00, inspecciona a los pedidos en transito
+     * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
+     */
+    @Override
     @Scheduled(cron = "0 0 0 * * *") //Funcion para su uso real
     @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void actualizarEnviosExtraviados() {
-       /*Ahora mismo la dejamos publica para usarla en los Tests
-        y el pasarle un Localdatetime tambien es por esta razon, por definicion seria simplemente llamar al .now()*/
         LocalDateTime ahora = LocalDateTime.now();
         for (Envio envio : repoEnvios.listEnvios()) {
             if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0) {
@@ -264,7 +266,6 @@ public class UjaPack implements ServicioUjaPack {
      */
     @Override
     public double porcentajeEnviosExtraviados(@NotBlank String ultimo) {
-        //El Switch es pensando en un desplegable de opciones limitadas
         double porcentaje = 0;
         LocalDateTime ahora = LocalDateTime.now();
         switch (ultimo.toLowerCase()) {
@@ -286,52 +287,6 @@ public class UjaPack implements ServicioUjaPack {
         }
 
         return porcentaje;
-    }
-
-    private void mandarNotificacion(Envio envio) {
-        //Antes sacabamos por pantalla pero hemos rectificado, ahora lo almacenamos con el objetivo de poder mostrarlo
-        String es;
-        if (envio.getRuta().get(envio.getRegistroActual()).getEntrada()) {
-            es = "ha salido de ";
-        } else {
-            es = "ha entrado a ";
-        }
-        if (envio.getEstado() == Estado.EnReparto) {
-            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " esta en " + envio.getNotificacion());
-
-        } else {
-            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion());
-
-        }
-
-        repoEnvios.actualizar(envio);
-    }
-
-    /**
-     * Activa la notificacion en un envio
-     *
-     * @param idenvio ID del envio
-     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
-     */
-    @Override
-    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
-    public void activarNotificacion(long idenvio, @NotBlank String noti) {
-        boolean existe = false;
-        for (Registro regis : repoEnvios.listRuta(idenvio)) {
-            if (noti.equals(regis.getPuntoR().getLugar()) && regis.isNull()) {
-                existe = true;
-                break;
-            }
-
-        }
-        if (existe) {
-            Envio envi = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
-            envi.setNotificacion(noti);
-            repoEnvios.actualizar(envi);
-        } else {
-            throw new DirNotificacionIncorrecta();
-        }
-
     }
 
     /**
@@ -418,7 +373,7 @@ public class UjaPack implements ServicioUjaPack {
     //@Transactional
     //  No funcionan ambas, se queda ignorado el transactional por lo que si queremos ahorrar codigo en los test seria asi,
     //  ya que al poner el PostConstruct una vez se crea con el Autowired se llama a esta funcion, funciona si la funcion no tiene argumentos por eso el String File esta dentro
-    public void leerJson() throws IOException {
+    private void leerJson() throws IOException {
         String file = ".\\src\\main\\resources\\redujapack.json";
         if (repoPuntosRuta.listPuntosRuta().isEmpty()) {
             Map<Integer, ArrayList<Integer>> conexiones = new HashMap<>();
@@ -591,5 +546,63 @@ public class UjaPack implements ServicioUjaPack {
         return calcularRuta(repoPuntosRuta.buscar(convertirStringEnPuntoRuta(remitente)).orElseThrow(EnvioNoRegistrado::new), repoPuntosRuta.buscar(convertirStringEnPuntoRuta(destinatario)).orElseThrow(EnvioNoRegistrado::new));
 
     }
+
+    // Se dejó comentada la parte de notificaciones
+
+    /*
+    private void mandarNotificacion(Envio envio) {
+        //Antes sacabamos por pantalla pero hemos rectificado, ahora lo almacenamos con el objetivo de poder mostrarlo
+        String es;
+        if (envio.getRuta().get(envio.getRegistroActual()).getEntrada()) {
+            es = "ha salido de ";
+        } else {
+            es = "ha entrado a ";
+        }
+
+        if (envio.getEstado() == Estado.EnReparto) {
+            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " esta en " + envio.getNotificacion());
+
+        } else {
+            envio.setDatosNotificacion("El envio con identificador " + envio.getId() + " " + es + envio.getNotificacion());
+
+        }
+
+        repoEnvios.actualizar(envio);
+    }
+
+ */
+
+    /**
+     * Activa la notificacion en un envio
+     *
+     * @param idenvio ID del envio
+     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
+     */
+    /*
+    @Override
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
+    public void activarNotificacion(long idenvio, @NotBlank String noti) {
+        boolean existe = false;
+        for (Registro regis : repoEnvios.listRuta(idenvio)) {
+            if (noti.equals(regis.getPuntoR().getLugar()) && regis.isNull()) {
+                existe = true;
+                break;
+            }
+
+        }
+        if (existe) {
+            Envio envi = repoEnvios.buscar(idenvio).orElseThrow(EnvioNoRegistrado::new);
+            envi.setNotificacion(noti);
+            repoEnvios.actualizar(envi);
+        } else {
+            throw new DirNotificacionIncorrecta();
+        }
+
+    }
+     */
+
+
+
+
 }
 

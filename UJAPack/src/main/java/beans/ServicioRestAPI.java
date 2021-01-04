@@ -1,7 +1,7 @@
 package beans;
 
 import DTO.EnvioDTO;
-import DTO.RespuestaDTO;
+import com.google.gson.Gson;
 import entidades.Envio;
 import excepciones.DirNotificacionIncorrecta;
 import excepciones.DireccionesIncorrectas;
@@ -26,12 +26,13 @@ import java.util.Set;
 @RequestMapping(ServicioRestAPI.URI_MAPPING)
 public class ServicioRestAPI {
     public static final String URI_MAPPING = "/ujapack";
+    private static final Gson gson = new Gson();
     @Autowired
     Mapeador mapper;
     @Autowired
     private UjaPack ujaPack;
 
-    @ExceptionHandler(TransactionSystemException.class)
+    @ExceptionHandler(TransactionSystemException.class) // Con el @ExceptionHandler(ConstraintViolationException.class) directamente no nos funcionaba
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerViolacionRestricciones(TransactionSystemException e) {
         Throwable cause = e.getRootCause();
@@ -43,9 +44,10 @@ public class ServicioRestAPI {
                 message += o.toString() + "  ";
 
             }
-            return ResponseEntity.badRequest().body(message);
+
+            return ResponseEntity.badRequest().body(gson.toJson(message));
         }
-        return ResponseEntity.badRequest().body(e.getMessage());
+        return ResponseEntity.badRequest().body(gson.toJson(e.getMessage()));
 
     }
 
@@ -57,18 +59,18 @@ public class ServicioRestAPI {
     @ExceptionHandler({DireccionesIncorrectas.class, DirNotificacionIncorrecta.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerDireccionesIncorrectas(RuntimeException e) {
-        return ResponseEntity.badRequest().body("Direccion incorrecta o no permitida");
+        return ResponseEntity.badRequest().body(gson.toJson("Direccion incorrecta o no permitida"));
     }
 
     @ExceptionHandler(OpcionPorcentaje.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handlerOpcionPorcentaje(OpcionPorcentaje e) {
-        return ResponseEntity.badRequest().body("Opcion consulta de porcentaje no soportada");
+        return ResponseEntity.badRequest().body(gson.toJson("Opcion consulta de porcentaje no soportada"));
     }
 
     @GetMapping("/")
     public ResponseEntity test() {
-        return new ResponseEntity<>("Funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", HttpStatus.OK);
+        return new ResponseEntity<>(gson.toJson("Funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧"), HttpStatus.OK);
     }
 
     @GetMapping(value = "/envios/public/{id}")
@@ -82,13 +84,16 @@ public class ServicioRestAPI {
     }
 
     @GetMapping(value = "/envios/public/{id}/actual")
-    public ResponseEntity<RespuestaDTO> consultaEstadoEnvio(@PathVariable("id") long id) {
+    public ResponseEntity<String> consultaEstadoEnvio(@PathVariable("id") long id) {
+        if (Long.toString(id).length() < 10) {//Numero menor de 10 cifras
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         String actu = ujaPack.situacionActualEnvio(id);
         if (actu.equals("")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
         }
-        return new ResponseEntity<>(new RespuestaDTO(actu), HttpStatus.OK);
+        return new ResponseEntity<>(gson.toJson(actu), HttpStatus.OK);
 
     }
 
@@ -172,6 +177,17 @@ public class ServicioRestAPI {
 
     }
 
+
+    @PutMapping("/envios/private/testextraviados") //Funcion para poder probar actualizar desde los test del rest
+    public ResponseEntity actualizarEnviosExtraviados() {
+        ujaPack.actualizarEnviosExtraviadosTest();
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
+
+
+
+/*
     @PutMapping("/envios/public/{id}/nuevanotificacion")
     public ResponseEntity nuevaNotificacionEnvio(@PathVariable("id") long id, @RequestParam() String notifi) {
         ujaPack.activarNotificacion(id, notifi);
@@ -179,18 +195,6 @@ public class ServicioRestAPI {
 
     }
 
-    @PutMapping("/envios/private/testextraviados") //Funcion para poder probar actualizar desde los test del rest
-    public ResponseEntity actualizarEnviosExtraviados(@RequestParam String _fecha) {
-        LocalDateTime fecha;
-
-        try {
-            fecha = _fecha != null ? LocalDateTime.parse(_fecha) : null;
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest().build();
-        }
-        ujaPack.actualizarEnviosExtraviados(fecha);
-        return ResponseEntity.status(HttpStatus.OK).build();
-
-    }
+ */
 
 }

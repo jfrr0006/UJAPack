@@ -31,13 +31,11 @@ public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
         httpsec.csrf().disable();
         httpsec.cors().and().httpBasic();
 
-
         String path = ServicioRestAPI.URI_MAPPING;
 
         httpsec.authorizeRequests().antMatchers(path + "/envios/public/**").permitAll();
-        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/public/**").permitAll();
-        httpsec.authorizeRequests().antMatchers(path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/private/**").hasAnyRole("ADMIN", "TRANSPORT");//NO coge los derechos del transport
+        httpsec.authorizeRequests().antMatchers(HttpMethod.GET,path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
+        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/private/**").hasAnyRole("ADMIN", "TRANSPORT");
         httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
 
 

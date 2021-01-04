@@ -20,9 +20,9 @@ public class Mapeador {
                 envio.getDatos_remitente(),
                 envio.getDatos_destinatario(),
                 envio.getEstado(),
-                envio.getRegistroActual(),
-                envio.getNotificacion(),
-                envio.getDatosNotificacion());
+                envio.getRegistroActual());
+        //   envio.getNotificacion(),
+        //   envio.getDatosNotificacion());
 
 
         envioDTO.setRuta(WebMvcLinkBuilder.

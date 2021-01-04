@@ -28,21 +28,22 @@ public class EnvioDTO {
     private String datos_remitente;
     /* Datos Destinatario */
     private String datos_destinatario;
-    /* Punto de control donde se notificara */
-    private String notificacion;
-    /* Notificacion */
-    private String datos_notificacion;
     /* Estado */
     private Estado estado;
+
+    /* Punto de control donde se notificara */
+    // private String notificacion;
+    /* Notificacion */
+    //  private String datos_notificacion;
 
     public EnvioDTO() {
 
     }
 
     public EnvioDTO(long _id, float _importe, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente,
-                    String _datos_destinatario, Estado _estado, int _registroactual, String _notificacion, String _datos_notificacion) {
+                    String _datos_destinatario, Estado _estado, int _registroactual) {
         this.id = _id;
-        this.importe = _importe;
+        this.setImporte(_importe);
         this.peso = _peso;
         this.dimensiones = _dimensiones;
         this.remitente = _remitente;
@@ -50,9 +51,9 @@ public class EnvioDTO {
         this.datos_remitente = _datos_remitente;
         this.datos_destinatario = _datos_destinatario;
         this.estado = _estado;
-        this.registroActual = _registroactual;
-        this.notificacion = _notificacion;
-        this.datos_notificacion = _datos_notificacion;
+        this.setRegistroActual(_registroactual);
+        //  this.notificacion = _notificacion;
+        // this.datos_notificacion = _datos_notificacion;
     }
 
     public EnvioDTO(String _remitente, String _destinatario, float _peso, float _dimensiones, String _datos_remitente,
@@ -99,18 +100,6 @@ public class EnvioDTO {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getRegistroActual() {
-        return registroActual;
-    }
-
-    public void setRegistroActual(int _registroActual) {
-        this.registroActual = _registroActual;
-    }
-
     public Link getRuta() {
         return ruta;
     }
@@ -119,35 +108,24 @@ public class EnvioDTO {
         this.ruta = _ruta;
     }
 
-    public String getNotificacion() {
-        return notificacion;
-    }
-
-    public void setNotificacion(String _notificacion) {
-        this.notificacion = _notificacion;
-    }
-
-    public String getDatos_notificacion() {
-        return datos_notificacion;
-    }
-
-    public void setDatos_notificacion(String _datos_notificacion) {
-        this.datos_notificacion = _datos_notificacion;
-    }
-
     public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(Estado _estado) {
-        this.estado = _estado;
-    }
 
     public float getImporte() {
         return importe;
     }
 
-    public void setImporte(float _importe) {
-        this.importe = _importe;
+    public void setImporte(float importe) {
+        this.importe = importe;
+    }
+
+    public int getRegistroActual() {
+        return registroActual;
+    }
+
+    public void setRegistroActual(int registroActual) {
+        this.registroActual = registroActual;
     }
 }

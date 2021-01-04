@@ -37,10 +37,16 @@ public interface ServicioUjaPack {
 
 
     /**
-     * Funcion funciona solo a las 00:00:00, inspecciona a los pedidos en transito
-     * y si han pasado mas de 7 dias modifica su estado a Extraviado y los añade a otro mapa
+     * Esta funcion es usada para los test, Marca minimo un envio como extraviado y los demas tienen un 50% de marcarse como extraviado,
+     * siempre y cuando tengo como estado En Transito
      */
-    void actualizarEnviosExtraviados(LocalDateTime ahora);
+    void actualizarEnviosExtraviadosTest();
+
+    /**
+     * Funcion funciona solo a las 00:00:00, inspecciona a los pedidos en transito
+     * y si han pasado mas de 7 dias modifica su estado a Extraviado
+     */
+    void actualizarEnviosExtraviados();
 
     /**
      * Busca los envios extraviados en un intervalo de tiempo
@@ -64,13 +70,6 @@ public interface ServicioUjaPack {
      */
     double porcentajeEnviosExtraviados(String ultimo);
 
-    /**
-     * Activa la notificacion en un envio
-     *
-     * @param idenvio ID del envio
-     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
-     */
-    void activarNotificacion(long idenvio, String noti);
 
     /**
      * Devuelve la situacion actual del envio
@@ -105,4 +104,12 @@ public interface ServicioUjaPack {
      * @param id del envio
      */
     Envio verEnvio(long id);
+
+    /**
+     * Activa la notificacion en un envio
+     *
+     * @param idenvio ID del envio
+     * @param noti    Punto donde se quiere tener una notificacion de su llegada/salida
+     */
+    // void activarNotificacion(long idenvio, String noti);
 }
