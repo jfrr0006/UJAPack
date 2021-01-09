@@ -70,8 +70,6 @@ public class Envio {
     //String datos_notificacion;
 
 
-
-
     public Envio(long _id, float _importe, List<Registro> _ruta, float _peso, float _dimensiones, String _remitente, String _destinatario, String _datos_remitente, String _datos_destinatario) {
         this.id = _id;
         this.importe = _importe;
@@ -145,7 +143,6 @@ public class Envio {
     public void avanzarRegistroActual() {
         this.registroActual++;
     }
-
 
 
     /**

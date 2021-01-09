@@ -26,9 +26,14 @@ public class RepositorioEnvio {
     @Cacheable(value = "envios", key = "#clave")
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public Optional<Envio> buscar(long clave) {
-        return Optional.ofNullable(em.find(Envio.class, clave));
+        Optional<Envio> envi = Optional.ofNullable(em.find(Envio.class, clave));
+        if (envi.isPresent()) {
+            envi.get().getRuta().size();
+        }
+        return envi;
     }
 
+    @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void insertar(Envio envio) {
         em.persist(envio);
     }

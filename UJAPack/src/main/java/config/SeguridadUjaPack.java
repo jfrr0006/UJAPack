@@ -33,10 +33,10 @@ public class SeguridadUjaPack extends WebSecurityConfigurerAdapter {
 
         String path = ServicioRestAPI.URI_MAPPING;
 
-        httpsec.authorizeRequests().antMatchers(path + "/envios/public/**").permitAll();
-        httpsec.authorizeRequests().antMatchers(HttpMethod.GET,path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/envios/private/**").hasAnyRole("ADMIN", "TRANSPORT");
-        httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path + "/envios/private/**").hasAnyRole("ADMIN", "OPERATOR");
+        httpsec.authorizeRequests().antMatchers(path + "/public/envios/**").permitAll();
+        httpsec.authorizeRequests().antMatchers(HttpMethod.GET, path + "/private/envios/**").hasAnyRole("ADMIN", "OPERATOR");
+        httpsec.authorizeRequests().antMatchers(HttpMethod.PUT, path + "/private/envios/**").hasAnyRole("ADMIN", "TRANSPORT");
+        httpsec.authorizeRequests().antMatchers(HttpMethod.POST, path + "/private/envios/**").hasAnyRole("ADMIN", "OPERATOR");
 
 
     }

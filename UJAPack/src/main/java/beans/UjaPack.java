@@ -10,11 +10,13 @@ import entidades.PuntoRuta.CentroLog;
 import entidades.PuntoRuta.Oficina;
 import entidades.PuntoRuta.PuntoRuta;
 import entidades.Registro;
+import excepciones.DDBBCaida;
 import excepciones.DireccionesIncorrectas;
 import excepciones.EnvioNoRegistrado;
 import excepciones.OpcionPorcentaje;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import servicios.ServicioUjaPack;
@@ -60,36 +62,44 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     public Envio generarEnvio(@NotBlank String remitente, @NotBlank String destinatario, @Positive Float peso, @Positive Float dimensiones, @NotBlank String _datos_remitente, @NotBlank String _datos_destinatario) {
 
-        List<PuntoRuta> ruta = listaRutaMinima(remitente, destinatario);
-        List<Registro> registros = new ArrayList<>();
-        long number;
+        try {
+            List<PuntoRuta> ruta = listaRutaMinima(remitente, destinatario);
+            List<Registro> registros = new ArrayList<>();
+            long number;
 
-        do {
-            number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
-        }while (repoEnvios.buscar(number).isPresent());
-        Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
-        repoEnvios.insertar(nuevoEnvio);
+            do {
+                number = (long) Math.floor(Math.random() * 9_000_000_000L) + 1_000_000_000L;
+            } while (repoEnvios.buscar(number).isPresent());
 
-        for (PuntoRuta punto : ruta) {
-            Registro aux1 = new Registro(punto);
-            Registro aux2 = new Registro(punto);
+            Envio nuevoEnvio = new Envio(number, calcularCosto(ruta.size(), peso, dimensiones), registros, peso, dimensiones, remitente, destinatario, _datos_remitente, _datos_destinatario);
+            repoEnvios.insertar(nuevoEnvio);
+            for (PuntoRuta punto : ruta) {
+                Registro aux1 = new Registro(punto);
+                Registro aux2 = new Registro(punto);
 
-            repoRegistro.insertar(aux1);
-            repoRegistro.insertar(aux2);
-            nuevoEnvio.getRuta().add(aux1);
-            nuevoEnvio.getRuta().add(aux2);
+                repoRegistro.insertar(aux1);
+                repoRegistro.insertar(aux2);
+                nuevoEnvio.getRuta().add(aux1);
+                nuevoEnvio.getRuta().add(aux2);
 
 
+            }
+            Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
+            repoRegistro.insertar(aux3);
+            nuevoEnvio.getRuta().add(aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
+
+            repoEnvios.actualizar(nuevoEnvio);
+
+            return nuevoEnvio;
+        } catch (DataAccessResourceFailureException e) {
+            throw new DDBBCaida();
         }
-        Registro aux3 = new Registro(ruta.get(ruta.size() - 1));
-        repoRegistro.insertar(aux3);
-        nuevoEnvio.getRuta().add(aux3);//Metemos el ultimo de nuevo por 3º vez para el registro entregado
 
-        repoEnvios.actualizar(nuevoEnvio);
-
-        return nuevoEnvio;
     }
 
+    /**
+     * Calcula el importe de un envio
+     */
     private Float calcularCosto(int numPuntosRuta, Float peso, Float dimensiones) {
         return (peso * dimensiones * (numPuntosRuta + 1)) / 1000;
 
@@ -130,7 +140,6 @@ public class UjaPack implements ServicioUjaPack {
     @Override
     public Envio verEnvio(long id) {
         Envio envio = repoEnvios.buscar(id).orElseThrow(EnvioNoRegistrado::new);
-        envio.getRuta().size();
         return envio;
     }
 
@@ -151,11 +160,6 @@ public class UjaPack implements ServicioUjaPack {
 
         envio.getRuta().get(envio.getRegistroActual()).actualizarRegistro(LocalDateTime.now(), entrada);
 
-        /* if (envio.getNotificacion().equals(envio.getRuta().get(envio.getRegistroActual()).getPuntoR().getLugar())) {
-            //Ha llegado al punto de notificacion
-            mandarNotificacion(envio);
-        }
-         */
         envio.avanzarRegistroActual();
 
     }
@@ -185,12 +189,12 @@ public class UjaPack implements ServicioUjaPack {
     @CacheEvict(cacheNames = {"enviosRuta", "envios"}, allEntries = true)
     public void actualizarEnviosExtraviadosTest() { //Funcion Para test
         LocalDateTime ahora = LocalDateTime.parse("2200-12-31T00:00:00");
-        boolean extravi= true;
+        boolean extravi = true;
         Random rand = new Random();
         if (ahora.getHour() == 0 && ahora.getMinute() == 0 && ahora.getSecond() == 0) {
             for (Envio envio : repoEnvios.listEnvios()) {//Pone uno como extraviado como minimo y apartir de ese es aleatorio
                 if (envio.getEstado() == Estado.EnTransito && envio.getRegistroActual() != 0 && extravi) {
-                    extravi=rand.nextBoolean();
+                    extravi = rand.nextBoolean();
                     LocalDateTime ultimoRegistro = (repoEnvios.listRuta(envio.getId()).get(envio.getRegistroActual() - 1)).getFecha();
                     long dias = ChronoUnit.DAYS.between(ultimoRegistro, ahora);
                     if (dias > 7) {
@@ -240,7 +244,6 @@ public class UjaPack implements ServicioUjaPack {
             LocalDateTime ultimoRegistro = repoEnvios.listRuta(envio.getId()).get(registroActual).getFecha();
             if (ultimoRegistro.isAfter(desde) && ultimoRegistro.isBefore(hasta)) {
                 extraviados.add(envio);
-
 
             }
 
@@ -600,8 +603,6 @@ public class UjaPack implements ServicioUjaPack {
 
     }
      */
-
-
 
 
 }
